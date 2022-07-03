@@ -1,6 +1,6 @@
 import { BrewEvent } from "@/models/brewEvent";
 import { createUUID } from "@/services/utils";
-import db from "./pouchdb";
+import couchDbProvider from "./pouchdb";
 
 export async function save(
   brewEvent: BrewEvent
@@ -18,7 +18,7 @@ export async function save(
     ingredients: brewEvent.ingredients,
   };
 
-  await db.put(doc).catch(() => {
+  await couchDbProvider.getCouchDb().put(doc).catch(() => {
     id = "";
     err = new Error("db error");
   });

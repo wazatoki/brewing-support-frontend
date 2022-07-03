@@ -1,5 +1,13 @@
 import PouchDB from "pouchdb";
 
-const db = new PouchDB("brewing_support_db");
+export class CouchDbProvider {
+    getCouchDb(dbName:string = "brewing_support_db"): PouchDB.Database<{}> {
 
-export default db;
+        return new PouchDB(
+            `${dbName}`,
+            {
+                skip_setup: true
+            });
+    }
+}
+export default new CouchDbProvider();
