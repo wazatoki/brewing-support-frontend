@@ -1,6 +1,6 @@
 import { BrewEvent } from "@/models/brewEvent";
-import { createUUID } from "./utils";
-import { db } from "./pouchdb";
+import { createUUID } from "@/services/utils";
+import db from "./pouchdb";
 
 export async function save(
   brewEvent: BrewEvent
