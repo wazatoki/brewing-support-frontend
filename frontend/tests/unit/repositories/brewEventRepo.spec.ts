@@ -18,7 +18,7 @@ const mockedPouchDbConfig = mockedPouchDbInstance as jest.Mocked<typeof mockedPo
 mockedGetDBInstance.mockReturnValue(mockedPouchDbInstance);
 
 describe("brewEventRepo.ts", () => {
-  it("renders id when passed", async () => {
+  it("returns error null when passed", async () => {
 
     const promise1 = new Promise<PouchDB.Core.Response>((resolve, reject) => {
       resolve({ ok: true, id: "1asd", rev: "1asc" });
@@ -30,6 +30,21 @@ describe("brewEventRepo.ts", () => {
 
     const result = await save(be);
     expect(result.err).toEqual(null);
+    expect(mockedPouchDbConfig.put).toBeCalled();
+  });
+
+  it("returns err when not passed", async () => {
+
+    const promise1 = new Promise<PouchDB.Core.Response>((resolve, reject) => {
+      reject();
+    });
+    
+    mockedPouchDbConfig.put.mockResolvedValue(promise1);
+
+    const be = new BrewEvent();
+
+    const result = await save(be);
+    expect(result.err).toEqual(new Error("db error"));
     expect(mockedPouchDbConfig.put).toBeCalled();
   });
 });
