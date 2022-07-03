@@ -1,11 +1,12 @@
 import PouchDB from "pouchdb";
-import couchDbProvider from "@/repositories/pouchdb";
+import * as pouchdb from "@/repositories/pouchdb";
 import { save } from "@/repositories/brewEventRepo";
 import { BrewEvent } from "@/models/brewEvent";
 
 jest.mock('@/repositories/pouchdb');
 jest.mock('pouchdb');
-const mockedCouchDbProvider = couchDbProvider as jest.Mocked<typeof couchDbProvider>;
+
+const mockedGetDBInstance = jest.spyOn(pouchdb, "default");
 
 // This is actually creates a **mocked pouchDb instance**. When we told Jest to import the pouchDb module it replaced constructors with ones that creates mocks.
 const mockedPouchDbInstance = new PouchDB(); 
@@ -13,7 +14,8 @@ const mockedPouchDbInstance = new PouchDB();
 // We do this just so we can configure the mock pouchDb's methods in a type safe way.
 const mockedPouchDbConfig = mockedPouchDbInstance as jest.Mocked<typeof mockedPouchDbInstance>;
 
-mockedCouchDbProvider.getCouchDb.mockReturnValue(mockedPouchDbInstance);
+
+mockedGetDBInstance.mockReturnValue(mockedPouchDbInstance);
 
 describe("brewEventRepo.ts", () => {
   it("renders id when passed", async () => {

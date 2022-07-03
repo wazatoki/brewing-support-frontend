@@ -1,13 +1,35 @@
 import PouchDB from "pouchdb";
 
-export class CouchDbProvider {
-    getCouchDb(dbName:string = "brewing_support_db"): PouchDB.Database<{}> {
+let db: PouchDB.Database<{}>;
 
-        return new PouchDB(
-            `${dbName}`,
-            {
-                skip_setup: true
-            });
+export default function getDBInstance(dbName: string = "brewing_support_db"): PouchDB.Database<{}> {
+
+    if (db.info.name === dbName) {
+        return db;
     }
+
+    return db = new PouchDB(
+        `${dbName}`,
+        {
+            skip_setup: true
+        }
+    );
+    
 }
-export default new CouchDbProvider();
+
+// export class CouchDbProvider {
+
+//     private db: PouchDB.Database<{}>;
+
+//     getCouchDb(dbName:string = "brewing_support_db"): PouchDB.Database<{}> {
+
+//         if
+
+//         return new PouchDB(
+//             `${dbName}`,
+//             {
+//                 skip_setup: true
+//             });
+//     }
+// }
+// export default new CouchDbProvider();
