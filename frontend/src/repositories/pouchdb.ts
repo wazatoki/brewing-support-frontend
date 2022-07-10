@@ -1,20 +1,19 @@
 import PouchDB from "pouchdb";
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 let db: PouchDB.Database<{}>;
 
-export default function getDBInstance(dbName: string = "brewing_support_db"): PouchDB.Database<{}> {
+export default function getDBInstance(
+  dbName = "brewing_support_db"
+  // eslint-disable-next-line @typescript-eslint/ban-types
+): PouchDB.Database<{}> {
+  if (db.info.name === dbName) {
+    return db;
+  }
 
-    if (db.info.name === dbName) {
-        return db;
-    }
-
-    return db = new PouchDB(
-        `${dbName}`,
-        {
-            skip_setup: true
-        }
-    );
-    
+  return (db = new PouchDB(`${dbName}`, {
+    skip_setup: true,
+  }));
 }
 
 // export class CouchDbProvider {

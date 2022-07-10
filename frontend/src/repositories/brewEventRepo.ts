@@ -18,10 +18,12 @@ export async function save(
     ingredients: brewEvent.ingredients,
   };
 
-  await getDBInstance().put(doc).catch(() => {
-    id = "";
-    err = new Error("db error");
-  });
+  await getDBInstance()
+    .put(doc)
+    .catch(() => {
+      id = "";
+      err = new Error("db error");
+    });
 
   return { id: id, err: err };
 }

@@ -3,11 +3,11 @@ import { Unit } from "./unit";
 export class Ingredient {
   id: string;
   name: string;
-  brewIngUnit: Unit;
+  brewingUnit: Unit;
 
   constructor(id = "", name = "", brewingUnit: Unit) {
     this.id = id;
     this.name = name;
-    this.brewIngUnit = brewingUnit;
+    this.brewingUnit = brewingUnit;
   }
 }

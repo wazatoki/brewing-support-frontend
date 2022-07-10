@@ -7,7 +7,7 @@ export class ConsumedIngredient {
   quantity: number;
 
   convertToBaseUnit(): { quantity: number; baseUnit: Unit } {
-    return this.ingredient.brewIngUnit.convertToBaseUnit(this.quantity);
+    return this.ingredient.brewingUnit.convertToBaseUnit(this.quantity);
   }
 
   constructor(id = "", ingredient: Ingredient, quantity = 0) {
