@@ -7,7 +7,7 @@ export default function getDBInstance(
   dbName = "brewing_support_db"
   // eslint-disable-next-line @typescript-eslint/ban-types
 ): PouchDB.Database<{}> {
-  if (db.info.name === dbName) {
+  if (db && db.info.name === dbName) {
     return db;
   }
 

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import HomeView from "@/views/HomeView.vue";
 import BrewingRecord from "@/views/BrewingRecord.vue";
+import MasterUnit from "@/views/MasterUnit.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -21,6 +22,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/brewing-record",
     name: "BrewingRecord",
     component: BrewingRecord,
+  },
+  {
+    path: "/master-unit",
+    name: "unitMaster",
+    component: MasterUnit,
   },
 ];
 

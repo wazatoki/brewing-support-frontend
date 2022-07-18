@@ -8,40 +8,32 @@ export async function fetchAll(): Promise<{
 }> {
   const unitIDs: string[] = [];
   const result: Unit[] = [];
-  const err: Error | null = null;
+  let err: Error | null = null;
 
   try {
     const unitIDsResult = await getDBInstance().get<{ ids: string[] }>(
       "type-unit-index"
     );
+    console.log(unitIDsResult);
     unitIDsResult.ids.forEach((item: string) => {
       unitIDs.push(item);
     });
-  } catch (e) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
     console.log(e);
+    err = new Error(e.name);
   }
 
   try {
-    const fetchResult = await getDBInstance().allDocs<{
-      type: string;
-      id: string;
-      name: string;
-      conversionFactor: number;
-      baseUnit: Unit;
-    }>({ include_docs: true, keys: unitIDs });
+    const fetchResult = await getDBInstance().allDocs<Unit>({
+      include_docs: true,
+      keys: unitIDs,
+    });
 
     fetchResult.rows.forEach(
       (item: {
         doc?:
-          | PouchDB.Core.ExistingDocument<
-              {
-                type: string;
-                id: string;
-                name: string;
-                conversionFactor: number;
-                baseUnit: Unit;
-              } & PouchDB.Core.AllDocsMeta
-            >
+          | PouchDB.Core.ExistingDocument<Unit & PouchDB.Core.AllDocsMeta>
           | undefined;
         id: string;
         key: string;
@@ -54,15 +46,17 @@ export async function fetchAll(): Promise<{
           const u = new Unit(
             item.doc.id,
             item.doc.name,
-            item.doc.conversionFactor,
-            item.doc.baseUnit
+            item.doc.conversionFactor
           );
+          u.baseUnit = item.doc.baseUnit;
           result.push(u);
         }
       }
     );
-  } catch (e) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
     console.log(e);
+    err = new Error(e.name);
   }
   return { result: result, err: err };
 }
@@ -72,6 +66,8 @@ export async function save(
 ): Promise<{ id: string; err: Error | null }> {
   let id = unit.id || createUUID();
   let err: Error | null = null;
+  const unitIDs: string[] = [];
+
   const doc = {
     _id: id,
     type: "unit",
@@ -81,12 +77,49 @@ export async function save(
     baseUnit: unit.baseUnit,
   };
 
+  try {
+    const unitIDsResult = await getDBInstance().get<{ ids: string[] }>(
+      "type-unit-index"
+    );
+    unitIDsResult.ids.forEach((item: string) => {
+      unitIDs.push(item);
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    console.log(e);
+    if (e.status === 404 && e.name === "not_found") {
+      const indexDoc = {
+        _id: "type-unit-index",
+        type: "type-index",
+        ids: unitIDs,
+      };
+      await getDBInstance()
+        .put(indexDoc)
+        .catch(() => {
+          err = new Error("db index error");
+        });
+    }
+  }
+
   await getDBInstance()
-    .put(doc)
+    .put(JSON.parse(JSON.stringify(doc)))
     .catch(() => {
       id = "";
       err = new Error("db error");
     });
+
+  if (unitIDs.includes(id) === false) {
+    unitIDs.push(id);
+    const indexDoc = await getDBInstance().get<{ ids: string[] }>(
+      "type-unit-index"
+    );
+    indexDoc.ids = unitIDs;
+    await getDBInstance()
+      .put(indexDoc)
+      .catch(() => {
+        err = new Error("db index error");
+      });
+  }
 
   return { id: id, err: err };
 }
