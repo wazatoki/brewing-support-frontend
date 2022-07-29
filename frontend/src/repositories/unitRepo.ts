@@ -9,7 +9,6 @@ const prefix = typename + "-";
 export async function fetchAll(): Promise<{
   result: Unit[];
 }> {
-  const unitIDs: string[] = [];
   const result: Unit[] = [];
 
   try {
@@ -42,6 +41,7 @@ export async function fetchAll(): Promise<{
         }
       }
     );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     console.log(e);
     throw new Error(e.name);
@@ -60,10 +60,12 @@ export async function save(unit: Unit): Promise<{ id: string }> {
     doc.baseUnit = unit.baseUnit;
     try {
       await getDBInstance().put(instanceToPlain(doc));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       console.log(e);
       throw new Error(e.name);
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     // ID検索の結果not_foundが返る => 新規保存
     if (e.name === "not_found") {
@@ -77,6 +79,7 @@ export async function save(unit: Unit): Promise<{ id: string }> {
       };
       try {
         await getDBInstance().put(instanceToPlain(doc));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         console.log(e);
         throw new Error(e.name);
