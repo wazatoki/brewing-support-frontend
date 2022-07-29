@@ -2,14 +2,14 @@
 import { reactive } from "vue";
 import { Unit } from "@/models/unit";
 
-defineProps({
+const props = defineProps({
   unitData: Unit,
   unitMsts: [],
 });
 
 const emit = defineEmits(["submitUnit", "clickCancel"]);
 
-const form = reactive(new Unit());
+const form = reactive(props.unitData);
 
 const onSubmit = () => {
   emit(
@@ -42,7 +42,7 @@ const onCancel = () => {
     <el-row>
       <el-col :span="24">
         <el-form-item label="基礎単位" :label-width="formLabelWidth">
-          <el-select v-model="form.baseUnit" class="form-input">
+          <el-select v-model="form.baseUnit" value-key="id" class="form-input">
             <el-option
               v-for="item in unitMsts"
               :key="item.id"

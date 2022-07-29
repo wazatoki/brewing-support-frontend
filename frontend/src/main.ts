@@ -5,6 +5,7 @@ import store from "./store";
 import ElementPlus from "element-plus";
 import "element-plus/dist/index.css";
 import locale from "element-plus/lib/locale/lang/ja";
+import "reflect-metadata";
 
 createApp(App)
   .use(store)

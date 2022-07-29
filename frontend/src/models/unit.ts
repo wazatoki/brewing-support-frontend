@@ -1,4 +1,4 @@
-export class Unit {
+export class Unit implements UnitMenber {
   id: string;
   name: string;
   conversionFactor: number;
@@ -26,4 +26,11 @@ export class Unit {
     this.conversionFactor = conversionFactor;
     this.baseUnit = baseUnit;
   }
+}
+
+export interface UnitMenber {
+  id: string;
+  name: string;
+  conversionFactor: number;
+  baseUnit: Unit | null;
 }

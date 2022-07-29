@@ -1,39 +1,28 @@
-import { Unit } from "@/models/unit";
+import { Unit, UnitMenber } from "@/models/unit";
 import { createUUID } from "@/services/utils";
 import getDBInstance from "./pouchdb";
+import { instanceToPlain } from "class-transformer";
+
+const typename = "unit";
+const prefix = typename + "-";
 
 export async function fetchAll(): Promise<{
   result: Unit[];
-  err: Error | null;
 }> {
   const unitIDs: string[] = [];
   const result: Unit[] = [];
-  let err: Error | null = null;
 
   try {
-    const unitIDsResult = await getDBInstance().get<{ ids: string[] }>(
-      "type-unit-index"
-    );
-    console.log(unitIDsResult);
-    unitIDsResult.ids.forEach((item: string) => {
-      unitIDs.push(item);
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (e: any) {
-    console.log(e);
-    err = new Error(e.name);
-  }
-
-  try {
-    const fetchResult = await getDBInstance().allDocs<Unit>({
+    const fetchResult = await getDBInstance().allDocs<UnitMenber>({
       include_docs: true,
-      keys: unitIDs,
+      startkey: prefix,
+      endkey: prefix + "\ufff0",
     });
 
     fetchResult.rows.forEach(
       (item: {
         doc?:
-          | PouchDB.Core.ExistingDocument<Unit & PouchDB.Core.AllDocsMeta>
+          | PouchDB.Core.ExistingDocument<UnitMenber & PouchDB.Core.AllDocsMeta>
           | undefined;
         id: string;
         key: string;
@@ -53,73 +42,51 @@ export async function fetchAll(): Promise<{
         }
       }
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     console.log(e);
-    err = new Error(e.name);
+    throw new Error(e.name);
   }
-  return { result: result, err: err };
+
+  return { result: result };
 }
 
-export async function save(
-  unit: Unit
-): Promise<{ id: string; err: Error | null }> {
-  let id = unit.id || createUUID();
-  let err: Error | null = null;
-  const unitIDs: string[] = [];
-
-  const doc = {
-    _id: id,
-    type: "unit",
-    id: id,
-    name: unit.name,
-    conversionFactor: unit.conversionFactor,
-    baseUnit: unit.baseUnit,
-  };
+export async function save(unit: Unit): Promise<{ id: string }> {
+  const id = unit.id || prefix + createUUID();
 
   try {
-    const unitIDsResult = await getDBInstance().get<{ ids: string[] }>(
-      "type-unit-index"
-    );
-    unitIDsResult.ids.forEach((item: string) => {
-      unitIDs.push(item);
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const doc = await getDBInstance().get<UnitMenber>(id);
+    doc.name = unit.name;
+    doc.conversionFactor = unit.conversionFactor;
+    doc.baseUnit = unit.baseUnit;
+    try {
+      await getDBInstance().put(instanceToPlain(doc));
+    } catch (e: any) {
+      console.log(e);
+      throw new Error(e.name);
+    }
   } catch (e: any) {
-    console.log(e);
-    if (e.status === 404 && e.name === "not_found") {
-      const indexDoc = {
-        _id: "type-unit-index",
-        type: "type-index",
-        ids: unitIDs,
+    // ID検索の結果not_foundが返る => 新規保存
+    if (e.name === "not_found") {
+      const doc = {
+        _id: id,
+        type: "unit",
+        id: id,
+        name: unit.name,
+        conversionFactor: unit.conversionFactor,
+        baseUnit: unit.baseUnit,
       };
-      await getDBInstance()
-        .put(indexDoc)
-        .catch(() => {
-          err = new Error("db index error");
-        });
+      try {
+        await getDBInstance().put(instanceToPlain(doc));
+      } catch (e: any) {
+        console.log(e);
+        throw new Error(e.name);
+      }
+      // ID検索の結果 DBでエラー発生
+    } else {
+      console.log(e);
+      throw new Error(e.name);
     }
   }
 
-  await getDBInstance()
-    .put(JSON.parse(JSON.stringify(doc)))
-    .catch(() => {
-      id = "";
-      err = new Error("db error");
-    });
-
-  if (unitIDs.includes(id) === false) {
-    unitIDs.push(id);
-    const indexDoc = await getDBInstance().get<{ ids: string[] }>(
-      "type-unit-index"
-    );
-    indexDoc.ids = unitIDs;
-    await getDBInstance()
-      .put(indexDoc)
-      .catch(() => {
-        err = new Error("db index error");
-      });
-  }
-
-  return { id: id, err: err };
+  return { id: id };
 }

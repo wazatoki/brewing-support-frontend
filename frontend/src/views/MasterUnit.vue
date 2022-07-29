@@ -17,7 +17,6 @@ const onClickCreate = () => {
 const onSubmitUnit = async (unitData) => {
   masterUnitFormDialogVisible.value = false;
   try {
-    console.log(JSON.stringify(unitData));
     await save(unitData);
     ElMessageBox.alert("データの保存に成功しました。", {
       confirmButtonText: "OK",
