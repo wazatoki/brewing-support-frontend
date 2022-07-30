@@ -51,16 +51,45 @@ export async function fetchAll(): Promise<{
 }
 
 export async function remove(unit: Unit) {
-  try {
-    const doc = await getDBInstance().get<UnitMenber>(unit.id);
-
+  const checkRemovable = await isRemovable(unit);
+  if (checkRemovable.result) {
     try {
-      await getDBInstance().remove(doc);
+      const doc = await getDBInstance().get<UnitMenber>(unit.id);
+
+      try {
+        await getDBInstance().remove(doc);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
+        console.log(e);
+        throw new Error(e.name);
+      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       console.log(e);
       throw new Error(e.name);
     }
+  } else {
+    throw new Error("参照データがあり削除できません。");
+  }
+}
+
+async function isRemovable(
+  unit: Unit
+): Promise<{ result: boolean; units: Unit[] }> {
+  const units: Unit[] = [];
+  try {
+    const fetchedUnits: Unit[] = await (await fetchAll()).result;
+    fetchedUnits.forEach((item: Unit) => {
+      if (item.baseUnit && item.baseUnit.id === unit.id) {
+        units.push(item);
+      }
+    });
+
+    if (units.length > 0) {
+      return { result: false, units: units };
+    }
+    return { result: true, units: units };
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     console.log(e);

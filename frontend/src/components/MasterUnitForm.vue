@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { Unit } from "@/models/unit";
 
 const props = defineProps({
@@ -10,6 +10,18 @@ const props = defineProps({
 const emit = defineEmits(["submitUnit", "clickCancel"]);
 
 const form = reactive(props.unitData);
+
+const rules = reactive({
+  name: [{ required: true, message: "名称は必須項目です。", trigger: "blur" }],
+  conversionFactor: [
+    {
+      type: "number",
+      min: "1",
+      message: "換算係数には１以上の数値を入力してください。",
+      trigger: "blur",
+    },
+  ],
+});
 
 const onSubmit = () => {
   emit(
@@ -24,18 +36,22 @@ const onCancel = () => {
 </script>
 
 <template>
-  <el-form :model="form">
+  <el-form :model="form" :rules="rules">
     <el-row>
       <el-col :span="24">
-        <el-form-item label="名称" :label-width="formLabelWidth">
+        <el-form-item label="名称" :label-width="formLabelWidth" prop="name">
           <el-input v-model="form.name" autocomplete="off" />
         </el-form-item>
       </el-col>
     </el-row>
     <el-row>
       <el-col :span="24">
-        <el-form-item label="換算係数" :label-width="formLabelWidth">
-          <el-input v-model="form.conversionFactor" autocomplete="off" />
+        <el-form-item
+          label="換算係数"
+          :label-width="formLabelWidth"
+          prop="conversionFactor"
+        >
+          <el-input v-model.number="form.conversionFactor" autocomplete="off" />
         </el-form-item>
       </el-col>
     </el-row>

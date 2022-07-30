@@ -7,7 +7,7 @@ export class Unit implements UnitMenber {
   clear() {
     this.id = "";
     this.name = "";
-    this.conversionFactor = 0;
+    this.conversionFactor = 1;
     this.baseUnit = null;
   }
 
