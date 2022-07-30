@@ -50,6 +50,24 @@ export async function fetchAll(): Promise<{
   return { result: result };
 }
 
+export async function remove(unit: Unit) {
+  try {
+    const doc = await getDBInstance().get<UnitMenber>(unit.id);
+
+    try {
+      await getDBInstance().remove(doc);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      console.log(e);
+      throw new Error(e.name);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    console.log(e);
+    throw new Error(e.name);
+  }
+}
+
 export async function save(unit: Unit): Promise<{ id: string }> {
   const id = unit.id || prefix + createUUID();
 
