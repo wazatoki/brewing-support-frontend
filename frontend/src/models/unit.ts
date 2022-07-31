@@ -1,8 +1,15 @@
-export class Unit implements UnitMenber {
+export class Unit implements UnitMember {
   id: string;
   name: string;
   conversionFactor: number;
   baseUnit: Unit | null;
+
+  isReferenceUnit(unit: Unit) {
+    if (this.baseUnit && this.baseUnit.id === unit.id) {
+      return true;
+    }
+    return false;
+  }
 
   clear() {
     this.id = "";
@@ -28,7 +35,7 @@ export class Unit implements UnitMenber {
   }
 }
 
-export interface UnitMenber {
+export interface UnitMember {
   id: string;
   name: string;
   conversionFactor: number;

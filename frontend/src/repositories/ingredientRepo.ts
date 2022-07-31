@@ -1,19 +1,18 @@
-import { Unit, UnitMember } from "@/models/unit";
-import { unitReferencingList } from "@/services/unit";
+import { Ingredient, IngredientMember } from "@/models/ingredient";
 import { createUUID } from "@/services/utils";
 import getDBInstance from "./pouchdb";
 import { instanceToPlain } from "class-transformer";
 
-const typename = "unit";
+const typename = "ingredient";
 const prefix = typename + "-";
 
 export async function fetchAll(): Promise<{
-  result: Unit[];
+  result: Ingredient[];
 }> {
-  const result: Unit[] = [];
+  const result: Ingredient[] = [];
 
   try {
-    const fetchResult = await getDBInstance().allDocs<UnitMember>({
+    const fetchResult = await getDBInstance().allDocs<IngredientMember>({
       include_docs: true,
       startkey: prefix,
       endkey: prefix + "\ufff0",
@@ -22,7 +21,9 @@ export async function fetchAll(): Promise<{
     fetchResult.rows.forEach(
       (item: {
         doc?:
-          | PouchDB.Core.ExistingDocument<UnitMember & PouchDB.Core.AllDocsMeta>
+          | PouchDB.Core.ExistingDocument<
+              IngredientMember & PouchDB.Core.AllDocsMeta
+            >
           | undefined;
         id: string;
         key: string;
@@ -32,12 +33,12 @@ export async function fetchAll(): Promise<{
         };
       }) => {
         if (item.doc) {
-          const u = new Unit(
+          const u = new Ingredient(
             item.doc.id,
             item.doc.name,
-            item.doc.conversionFactor
+            item.doc.brewingUnit
           );
-          u.baseUnit = item.doc.baseUnit;
+          u.brewingUnit = item.doc.brewingUnit;
           result.push(u);
         }
       }
@@ -51,40 +52,17 @@ export async function fetchAll(): Promise<{
   return { result: result };
 }
 
-export async function remove(unit: Unit) {
-  const checkRemovable = await isRemovable(unit);
-  if (checkRemovable.result) {
-    try {
-      const doc = await getDBInstance().get<UnitMember>(unit.id);
+export async function remove(ingredient: Ingredient) {
+  try {
+    const doc = await getDBInstance().get<IngredientMember>(ingredient.id);
 
-      try {
-        await getDBInstance().remove(doc);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (e: any) {
-        console.log(e);
-        throw new Error(e.name);
-      }
+    try {
+      await getDBInstance().remove(doc);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       console.log(e);
       throw new Error(e.name);
     }
-  } else {
-    throw new Error("参照データがあり削除できません。");
-  }
-}
-
-async function isRemovable(
-  unit: Unit
-): Promise<{ result: boolean; units: Unit[] }> {
-  try {
-    const fetchedUnits: Unit[] = (await fetchAll()).result;
-    const units: Unit[] = unitReferencingList(fetchedUnits, unit);
-    if (units.length > 0) {
-      return { result: false, units: units };
-    }
-    return { result: true, units: units };
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     console.log(e);
@@ -92,14 +70,13 @@ async function isRemovable(
   }
 }
 
-export async function save(unit: Unit): Promise<{ id: string }> {
-  const id = unit.id || prefix + createUUID();
+export async function save(ingredient: Ingredient): Promise<{ id: string }> {
+  const id = ingredient.id || prefix + createUUID();
 
   try {
-    const doc = await getDBInstance().get<UnitMember>(id);
-    doc.name = unit.name;
-    doc.conversionFactor = unit.conversionFactor;
-    doc.baseUnit = unit.baseUnit;
+    const doc = await getDBInstance().get<IngredientMember>(id);
+    doc.name = ingredient.name;
+    doc.brewingUnit = ingredient.brewingUnit;
     try {
       await getDBInstance().put(instanceToPlain(doc));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -113,11 +90,10 @@ export async function save(unit: Unit): Promise<{ id: string }> {
     if (e.name === "not_found") {
       const doc = {
         _id: id,
-        type: "unit",
+        type: "ingredient",
         id: id,
-        name: unit.name,
-        conversionFactor: unit.conversionFactor,
-        baseUnit: unit.baseUnit,
+        name: ingredient.name,
+        brewingUnit: ingredient.brewingUnit,
       };
       try {
         await getDBInstance().put(instanceToPlain(doc));
