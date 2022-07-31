@@ -6,6 +6,7 @@ import { Ingredient, IngredientMember } from "@/models/ingredient";
 import { Unit } from "@/models/unit";
 import { sortByNameAndConversionFactor } from "@/services/unit";
 import MasterIngredientFormVue from "@/components/MasterIngredientForm.vue";
+import { ElMessageBox } from "element-plus";
 
 const tableData = reactive([]);
 const unitMsts = reactive([]);
@@ -14,6 +15,25 @@ const masterIngredientFormDialogVisible = ref(false);
 const onClickCreate = () => {
   a_ingredientData.clear();
   masterIngredientFormDialogVisible.value = true;
+};
+
+const onSubmitUnit = async (ingredientData) => {
+  masterIngredientFormDialogVisible.value = false;
+  try {
+    await save(ingredientData);
+    ElMessageBox.alert("データの保存に成功しました。", {
+      confirmButtonText: "OK",
+    });
+    fetchData();
+  } catch (error) {
+    ElMessageBox.alert("データの保存に失敗しました。" + error.message, {
+      confirmButtonText: "OK",
+    });
+  }
+};
+
+const onClickMasterIngredientFormCancel = () => {
+  masterIngredientFormDialogVisible.value = false;
 };
 
 onMounted(() => {
@@ -65,13 +85,31 @@ const fetchData = async () => {
           <el-menu-item @click="onClickCreate">新規作成</el-menu-item>
         </el-menu>
       </el-col>
+      <el-col :span="18">
+        <el-table :data="tableData" stripe style="width: 100%">
+          <el-table-column prop="name" label="名称" />
+          <el-table-column prop="brewingUnit.name" label="使用単位" />
+          <el-table-column>
+            <template #default="scope">
+              <el-button @click="onClickEdit(scope.$index, scope.row)"
+                >修正</el-button
+              >
+              <el-button
+                type="danger"
+                @click="onClickDelete(scope.$index, scope.row)"
+                >削除</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-col>
     </el-row>
     <el-dialog v-model="masterIngredientFormDialogVisible">
       <MasterIngredientFormVue
         :ingredientData="a_ingredientData"
         :unitMsts="unitMsts"
         @submitUnit="onSubmitUnit($event)"
-        @clickCancel="onClickMasterUnitFormCancel"
+        @clickCancel="onClickMasterIngredientFormCancel"
       >
       </MasterIngredientFormVue>
     </el-dialog>
