@@ -2,7 +2,7 @@
 import { reactive, ref, onMounted } from "vue";
 import { fetchAll, save, remove } from "@/repositories/ingredientRepo";
 import { fetchAll as unitFetchAll } from "@/repositories/unitRepo";
-import { Ingredient, IngredientMember } from "@/models/ingredient";
+import { Ingredient } from "@/models/ingredient";
 import { Unit } from "@/models/unit";
 import { sortByNameAndConversionFactor } from "@/services/unit";
 import MasterIngredientFormVue from "@/components/MasterIngredientForm.vue";
@@ -17,7 +17,7 @@ const onClickCreate = () => {
   masterIngredientFormDialogVisible.value = true;
 };
 
-const onSubmitUnit = async (ingredientData) => {
+const onSubmitIngredient = async (ingredientData) => {
   masterIngredientFormDialogVisible.value = false;
   try {
     await save(ingredientData);
@@ -108,7 +108,7 @@ const fetchData = async () => {
       <MasterIngredientFormVue
         :ingredientData="a_ingredientData"
         :unitMsts="unitMsts"
-        @submitUnit="onSubmitUnit($event)"
+        @submitIngredient="onSubmitIngredient($event)"
         @clickCancel="onClickMasterIngredientFormCancel"
       >
       </MasterIngredientFormVue>
