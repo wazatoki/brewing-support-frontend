@@ -4,11 +4,21 @@ export class Ingredient {
   id: string;
   name: string;
   brewingUnit: Unit;
+  recievingUnit: Unit;
+  stockingUnit: Unit;
 
-  constructor(id = "", name = "", brewingUnit: Unit) {
+  constructor(
+    id = "",
+    name = "",
+    brewingUnit: Unit,
+    recievingUnit: Unit,
+    stockingUnit: Unit
+  ) {
     this.id = id;
     this.name = name;
     this.brewingUnit = brewingUnit;
+    this.recievingUnit = recievingUnit;
+    this.stockingUnit = stockingUnit;
   }
 
   clear() {
@@ -29,4 +39,6 @@ export interface IngredientMember {
   id: string;
   name: string;
   brewingUnit: Unit;
+  recievingUnit: Unit;
+  stockingUnit: Unit;
 }

@@ -10,7 +10,11 @@ import { ElMessageBox } from "element-plus";
 
 const tableData = reactive([]);
 const unitMsts = reactive([]);
-const a_ingredientData = reactive(new Ingredient("", "", new Unit()));
+const a_ingredientData = reactive(
+  new Ingredient("", "", new Unit()),
+  new Unit(),
+  new Unit()
+);
 const masterIngredientFormDialogVisible = ref(false);
 const onClickCreate = () => {
   a_ingredientData.clear();

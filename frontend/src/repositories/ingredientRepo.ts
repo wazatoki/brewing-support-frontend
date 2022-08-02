@@ -36,7 +36,9 @@ export async function fetchAll(): Promise<{
           const u = new Ingredient(
             item.doc.id,
             item.doc.name,
-            item.doc.brewingUnit
+            item.doc.brewingUnit,
+            item.doc.recievingUnit,
+            item.doc.stockingUnit
           );
           u.brewingUnit = item.doc.brewingUnit;
           result.push(u);
