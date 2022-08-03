@@ -1,22 +1,21 @@
-import { Unit, UnitMember } from "@/models/unit";
-import { unitReferencingList } from "@/services/unit";
-import { unitReferencingList as ingredientUnitReferencingList} from "@/services/ingredient";
+import { IngredientClassification, IngredientClassificationMember } from "@/models/ingredientClassification";
+import { ingredientClassificationReferencingList } from "@/services/ingredient";
 import { fetchAll as ingredientFetchAll } from "@/repositories/ingredientRepo";
 import { createUUID } from "@/services/utils";
 import getDBInstance from "./pouchdb";
 import { instanceToPlain } from "class-transformer";
 import { Ingredient } from "@/models/ingredient";
 
-const typename = "unit";
+const typename = "ingredient_classification";
 const prefix = typename + "-";
 
 export async function fetchAll(): Promise<{
-  result: Unit[];
+  result: IngredientClassification[];
 }> {
-  const result: Unit[] = [];
+  const result: IngredientClassification[] = [];
 
   try {
-    const fetchResult = await getDBInstance().allDocs<UnitMember>({
+    const fetchResult = await getDBInstance().allDocs<IngredientClassificationMember>({
       include_docs: true,
       startkey: prefix,
       endkey: prefix + "\ufff0",
@@ -25,7 +24,7 @@ export async function fetchAll(): Promise<{
     fetchResult.rows.forEach(
       (item: {
         doc?:
-          | PouchDB.Core.ExistingDocument<UnitMember & PouchDB.Core.AllDocsMeta>
+          | PouchDB.Core.ExistingDocument<IngredientClassificationMember & PouchDB.Core.AllDocsMeta>
           | undefined;
         id: string;
         key: string;
@@ -35,13 +34,11 @@ export async function fetchAll(): Promise<{
         };
       }) => {
         if (item.doc) {
-          const u = new Unit(
+          const ingredientClassification = new IngredientClassification(
             item.doc.id,
-            item.doc.name,
-            item.doc.conversionFactor
+            item.doc.name
           );
-          u.baseUnit = item.doc.baseUnit;
-          result.push(u);
+          result.push(ingredientClassification);
         }
       }
     );
@@ -54,11 +51,11 @@ export async function fetchAll(): Promise<{
   return { result: result };
 }
 
-export async function remove(unit: Unit) {
-  const checkRemovable = await isRemovable(unit);
+export async function remove(ingredientClassification: IngredientClassification) {
+  const checkRemovable = await isRemovable(ingredientClassification);
   if (checkRemovable.result) {
     try {
-      const doc = await getDBInstance().get<UnitMember>(unit.id);
+      const doc = await getDBInstance().get<IngredientClassificationMember>(ingredientClassification.id);
 
       try {
         await getDBInstance().remove(doc);
@@ -78,17 +75,15 @@ export async function remove(unit: Unit) {
 }
 
 async function isRemovable(
-  unit: Unit
-): Promise<{ result: boolean; units: Unit[]; ingredients: Ingredient[] }> {
+  ingredientClassification: IngredientClassification
+): Promise<{ result: boolean; ingredients: Ingredient[] }> {
   try {
-    const fetchedUnits: Unit[] = (await fetchAll()).result;
     const fetchedIngredients: Ingredient[] = (await ingredientFetchAll()).result;
-    const units: Unit[] = unitReferencingList(fetchedUnits, unit);
-    const ingredients:Ingredient[] = ingredientUnitReferencingList(fetchedIngredients, unit);
-    if (units.length > 0) {
-      return { result: false, units: units, ingredients: ingredients };
+    const ingredients: Ingredient[] = ingredientClassificationReferencingList(fetchedIngredients, ingredientClassification);
+    if (ingredients.length > 0) {
+      return { result: false, ingredients: ingredients };
     }
-    return { result: true, units: units, ingredients: ingredients };
+    return { result: true, ingredients: ingredients };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
@@ -97,14 +92,12 @@ async function isRemovable(
   }
 }
 
-export async function save(unit: Unit): Promise<{ id: string }> {
-  const id = unit.id || prefix + createUUID();
+export async function save(ingredientClassification: IngredientClassification): Promise<{ id: string }> {
+  const id = ingredientClassification.id || prefix + createUUID();
 
   try {
-    const doc = await getDBInstance().get<UnitMember>(id);
-    doc.name = unit.name;
-    doc.conversionFactor = unit.conversionFactor;
-    doc.baseUnit = unit.baseUnit;
+    const doc = await getDBInstance().get<IngredientClassificationMember>(id);
+    doc.name = ingredientClassification.name;
     try {
       await getDBInstance().put(instanceToPlain(doc));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -120,9 +113,7 @@ export async function save(unit: Unit): Promise<{ id: string }> {
         _id: id,
         type: typename,
         id: id,
-        name: unit.name,
-        conversionFactor: unit.conversionFactor,
-        baseUnit: unit.baseUnit,
+        name: ingredientClassification.name,
       };
       try {
         await getDBInstance().put(instanceToPlain(doc));

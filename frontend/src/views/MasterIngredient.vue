@@ -3,6 +3,7 @@ import { reactive, ref, onMounted } from "vue";
 import { fetchAll, save, remove } from "@/repositories/ingredientRepo";
 import { fetchAll as unitFetchAll } from "@/repositories/unitRepo";
 import { Ingredient } from "@/models/ingredient";
+import { IngredientClassification } from "@/models/ingredientClassification";
 import { Unit } from "@/models/unit";
 import { sortByNameAndConversionFactor } from "@/services/unit";
 import MasterIngredientFormVue from "@/components/MasterIngredientForm.vue";
@@ -11,9 +12,14 @@ import { ElMessageBox } from "element-plus";
 const tableData = reactive([]);
 const unitMsts = reactive([]);
 const a_ingredientData = reactive(
-  new Ingredient("", "", new Unit()),
-  new Unit(),
-  new Unit()
+  new Ingredient(
+    "",
+    "",
+    new IngredientClassification(),
+    new Unit(),
+    new Unit(),
+    new Unit()
+  )
 );
 const masterIngredientFormDialogVisible = ref(false);
 const onClickCreate = () => {

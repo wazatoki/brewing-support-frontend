@@ -36,6 +36,7 @@ export async function fetchAll(): Promise<{
           const u = new Ingredient(
             item.doc.id,
             item.doc.name,
+            item.doc.ingredientClassification,
             item.doc.brewingUnit,
             item.doc.recievingUnit,
             item.doc.stockingUnit
@@ -92,7 +93,7 @@ export async function save(ingredient: Ingredient): Promise<{ id: string }> {
     if (e.name === "not_found") {
       const doc = {
         _id: id,
-        type: "ingredient",
+        type: typename,
         id: id,
         name: ingredient.name,
         brewingUnit: ingredient.brewingUnit,

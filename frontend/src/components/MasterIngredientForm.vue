@@ -26,7 +26,7 @@ const onSubmit = async (formEl) => {
     if (valid) {
       emit(
         "submitIngredient",
-        new Ingredient(form.id, form.name, form.brewingUnit, form.recievingUnit, form.stockingUnit)
+        new Ingredient(form.id, form.name, form.ingredientClassification, form.brewingUnit, form.recievingUnit, form.stockingUnit)
       );
       console.log("submit!");
     } else {

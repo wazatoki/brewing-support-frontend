@@ -1,8 +1,10 @@
 import { Unit } from "./unit";
+import { IngredientClassification } from "./ingredientClassification";
 
 export class Ingredient {
   id: string;
   name: string;
+  ingredientClassification: IngredientClassification;
   brewingUnit: Unit;
   recievingUnit: Unit;
   stockingUnit: Unit;
@@ -10,12 +12,14 @@ export class Ingredient {
   constructor(
     id = "",
     name = "",
+    ingredientClassification: IngredientClassification,
     brewingUnit: Unit,
     recievingUnit: Unit,
     stockingUnit: Unit
   ) {
     this.id = id;
     this.name = name;
+    this.ingredientClassification = ingredientClassification;
     this.brewingUnit = brewingUnit;
     this.recievingUnit = recievingUnit;
     this.stockingUnit = stockingUnit;
@@ -28,7 +32,16 @@ export class Ingredient {
   }
 
   isReferenceUnit(unit: Unit) {
-    if (this.brewingUnit && this.brewingUnit.id === unit.id) {
+    if ((this.brewingUnit && this.brewingUnit.id === unit.id) 
+    || (this.recievingUnit && this.recievingUnit.id === unit.id) 
+    || (this.stockingUnit && this.stockingUnit.id === unit.id)) {
+      return true;
+    }
+    return false;
+  }
+
+  isReferenceIngredientClassification(ingredientClassification: IngredientClassification) {
+    if (this.ingredientClassification && this.ingredientClassification.id === ingredientClassification.id) {
       return true;
     }
     return false;
@@ -38,6 +51,7 @@ export class Ingredient {
 export interface IngredientMember {
   id: string;
   name: string;
+  ingredientClassification: IngredientClassification;
   brewingUnit: Unit;
   recievingUnit: Unit;
   stockingUnit: Unit;
