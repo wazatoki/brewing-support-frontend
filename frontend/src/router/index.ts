@@ -3,6 +3,7 @@ import HomeView from "@/views/HomeView.vue";
 import BrewingRecord from "@/views/BrewingRecord.vue";
 import MasterUnit from "@/views/MasterUnit.vue";
 import MasterIngredient from "@/views/MasterIngredient.vue";
+import MasterIngredientClassification from "@/views/MasterIngredientClassification.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -33,6 +34,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/master-ingredient",
     name: "ingredientMaster",
     component: MasterIngredient,
+  },
+  {
+    path: "/master-ingredient-classification",
+    name: "ingredientClassificationMaster",
+    component: MasterIngredientClassification,
   },
 ];
 

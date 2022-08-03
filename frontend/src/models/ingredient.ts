@@ -32,16 +32,23 @@ export class Ingredient {
   }
 
   isReferenceUnit(unit: Unit) {
-    if ((this.brewingUnit && this.brewingUnit.id === unit.id) 
-    || (this.recievingUnit && this.recievingUnit.id === unit.id) 
-    || (this.stockingUnit && this.stockingUnit.id === unit.id)) {
+    if (
+      (this.brewingUnit && this.brewingUnit.id === unit.id) ||
+      (this.recievingUnit && this.recievingUnit.id === unit.id) ||
+      (this.stockingUnit && this.stockingUnit.id === unit.id)
+    ) {
       return true;
     }
     return false;
   }
 
-  isReferenceIngredientClassification(ingredientClassification: IngredientClassification) {
-    if (this.ingredientClassification && this.ingredientClassification.id === ingredientClassification.id) {
+  isReferenceIngredientClassification(
+    ingredientClassification: IngredientClassification
+  ) {
+    if (
+      this.ingredientClassification &&
+      this.ingredientClassification.id === ingredientClassification.id
+    ) {
       return true;
     }
     return false;

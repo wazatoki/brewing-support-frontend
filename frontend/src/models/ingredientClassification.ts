@@ -6,9 +6,13 @@ export class IngredientClassification {
     this.id = id;
     this.name = name;
   }
+
+  clear() {
+    this.name = "";
+  }
 }
 
-export interface IngredientClassificationMember{
+export interface IngredientClassificationMember {
   id: string;
   name: string;
 }

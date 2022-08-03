@@ -15,7 +15,7 @@ export function ingredientClassificationReferencingList(
   });
 
   return ingredients;
-};
+}
 
 export function unitReferencingList(
   targetIngredients: Ingredient[],

@@ -16,10 +16,15 @@
       <el-sub-menu index="4">
         <template #title>各種マスタ</template>
         <el-menu-item index="4-1"
-          ><router-link to="/master-unit">単位</router-link></el-menu-item
+          ><router-link to="/master-ingredient">原料</router-link></el-menu-item
         >
         <el-menu-item index="4-2"
-          ><router-link to="/master-ingredient">原料</router-link></el-menu-item
+          ><router-link to="/master-ingredient-classification"
+            >原料種類</router-link
+          ></el-menu-item
+        >
+        <el-menu-item index="4-3"
+          ><router-link to="/master-unit">単位</router-link></el-menu-item
         >
       </el-sub-menu>
     </el-menu>

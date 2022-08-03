@@ -1,4 +1,7 @@
-import { IngredientClassification, IngredientClassificationMember } from "@/models/ingredientClassification";
+import {
+  IngredientClassification,
+  IngredientClassificationMember,
+} from "@/models/ingredientClassification";
 import { ingredientClassificationReferencingList } from "@/services/ingredient";
 import { fetchAll as ingredientFetchAll } from "@/repositories/ingredientRepo";
 import { createUUID } from "@/services/utils";
@@ -15,16 +18,19 @@ export async function fetchAll(): Promise<{
   const result: IngredientClassification[] = [];
 
   try {
-    const fetchResult = await getDBInstance().allDocs<IngredientClassificationMember>({
-      include_docs: true,
-      startkey: prefix,
-      endkey: prefix + "\ufff0",
-    });
+    const fetchResult =
+      await getDBInstance().allDocs<IngredientClassificationMember>({
+        include_docs: true,
+        startkey: prefix,
+        endkey: prefix + "\ufff0",
+      });
 
     fetchResult.rows.forEach(
       (item: {
         doc?:
-          | PouchDB.Core.ExistingDocument<IngredientClassificationMember & PouchDB.Core.AllDocsMeta>
+          | PouchDB.Core.ExistingDocument<
+              IngredientClassificationMember & PouchDB.Core.AllDocsMeta
+            >
           | undefined;
         id: string;
         key: string;
@@ -51,11 +57,15 @@ export async function fetchAll(): Promise<{
   return { result: result };
 }
 
-export async function remove(ingredientClassification: IngredientClassification) {
+export async function remove(
+  ingredientClassification: IngredientClassification
+) {
   const checkRemovable = await isRemovable(ingredientClassification);
   if (checkRemovable.result) {
     try {
-      const doc = await getDBInstance().get<IngredientClassificationMember>(ingredientClassification.id);
+      const doc = await getDBInstance().get<IngredientClassificationMember>(
+        ingredientClassification.id
+      );
 
       try {
         await getDBInstance().remove(doc);
@@ -78,8 +88,12 @@ async function isRemovable(
   ingredientClassification: IngredientClassification
 ): Promise<{ result: boolean; ingredients: Ingredient[] }> {
   try {
-    const fetchedIngredients: Ingredient[] = (await ingredientFetchAll()).result;
-    const ingredients: Ingredient[] = ingredientClassificationReferencingList(fetchedIngredients, ingredientClassification);
+    const fetchedIngredients: Ingredient[] = (await ingredientFetchAll())
+      .result;
+    const ingredients: Ingredient[] = ingredientClassificationReferencingList(
+      fetchedIngredients,
+      ingredientClassification
+    );
     if (ingredients.length > 0) {
       return { result: false, ingredients: ingredients };
     }
@@ -92,7 +106,9 @@ async function isRemovable(
   }
 }
 
-export async function save(ingredientClassification: IngredientClassification): Promise<{ id: string }> {
+export async function save(
+  ingredientClassification: IngredientClassification
+): Promise<{ id: string }> {
   const id = ingredientClassification.id || prefix + createUUID();
 
   try {

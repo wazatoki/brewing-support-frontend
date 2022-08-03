@@ -1,6 +1,6 @@
 import { Unit, UnitMember } from "@/models/unit";
 import { unitReferencingList } from "@/services/unit";
-import { unitReferencingList as ingredientUnitReferencingList} from "@/services/ingredient";
+import { unitReferencingList as ingredientUnitReferencingList } from "@/services/ingredient";
 import { fetchAll as ingredientFetchAll } from "@/repositories/ingredientRepo";
 import { createUUID } from "@/services/utils";
 import getDBInstance from "./pouchdb";
@@ -82,9 +82,13 @@ async function isRemovable(
 ): Promise<{ result: boolean; units: Unit[]; ingredients: Ingredient[] }> {
   try {
     const fetchedUnits: Unit[] = (await fetchAll()).result;
-    const fetchedIngredients: Ingredient[] = (await ingredientFetchAll()).result;
+    const fetchedIngredients: Ingredient[] = (await ingredientFetchAll())
+      .result;
     const units: Unit[] = unitReferencingList(fetchedUnits, unit);
-    const ingredients:Ingredient[] = ingredientUnitReferencingList(fetchedIngredients, unit);
+    const ingredients: Ingredient[] = ingredientUnitReferencingList(
+      fetchedIngredients,
+      unit
+    );
     if (units.length > 0) {
       return { result: false, units: units, ingredients: ingredients };
     }
