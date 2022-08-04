@@ -2,15 +2,19 @@
 import { reactive, ref, onMounted } from "vue";
 import { fetchAll, save, remove } from "@/repositories/ingredientRepo";
 import { fetchAll as unitFetchAll } from "@/repositories/unitRepo";
+import { fetchAll as ingredientClassificationFetchAll } from "@/repositories/ingredientClassificationRepo";
 import { Ingredient } from "@/models/ingredient";
 import { IngredientClassification } from "@/models/ingredientClassification";
 import { Unit } from "@/models/unit";
 import { sortByNameAndConversionFactor } from "@/services/unit";
+import { sortByName as sortClassificationByName } from "@/services/ingredientClassification";
+import { sortByClassifientNameAndName } from "@/services/ingredient";
 import MasterIngredientFormVue from "@/components/MasterIngredientForm.vue";
 import { ElMessageBox } from "element-plus";
 
 const tableData = reactive([]);
 const unitMsts = reactive([]);
+const ingredientClassificationMsts = reactive([]);
 const a_ingredientData = reactive(
   new Ingredient(
     "",
@@ -22,6 +26,38 @@ const a_ingredientData = reactive(
   )
 );
 const masterIngredientFormDialogVisible = ref(false);
+
+const onClickDelete = async (index) => {
+  await ElMessageBox.confirm("データを削除しますか?", {
+    confirmButtonText: "OK",
+    cancelButtonText: "Cancel",
+    type: "alert",
+  });
+  const item = tableData[index];
+  try {
+    await remove(item);
+    ElMessageBox.alert("データの削除に成功しました。", {
+      confirmButtonText: "OK",
+    });
+    fetchData();
+  } catch (error) {
+    ElMessageBox.alert("データの削除に失敗しました。" + error.message, {
+      confirmButtonText: "OK",
+    });
+  }
+};
+
+const onClickEdit = (index) => {
+  const item = tableData[index];
+  a_ingredientData.id = item.id;
+  a_ingredientData.name = item.name;
+  a_ingredientData.ingredientClassification = item.ingredientClassification;
+  a_ingredientData.brewingUnit = item.brewingUnit;
+  a_ingredientData.recievingUnit = item.recievingUnit;
+  a_ingredientData.stockingUnit = item.stockingUnit;
+  masterIngredientFormDialogVisible.value = true;
+};
+
 const onClickCreate = () => {
   a_ingredientData.clear();
   masterIngredientFormDialogVisible.value = true;
@@ -49,7 +85,17 @@ const onClickMasterIngredientFormCancel = () => {
 onMounted(() => {
   fetchData();
   fetchUnitMsts();
+  fetchIngredientClassificationMsts();
 });
+
+const fetchIngredientClassificationMsts = async () => {
+  const data = await ingredientClassificationFetchAll();
+  const sortedData = sortClassificationByName(data.result);
+  ingredientClassificationMsts.splice(0);
+  sortedData.forEach((item) => {
+    ingredientClassificationMsts.push(item);
+  });
+};
 
 const fetchUnitMsts = async () => {
   const data = await unitFetchAll();
@@ -62,26 +108,9 @@ const fetchUnitMsts = async () => {
 
 const fetchData = async () => {
   const data = await fetchAll();
-  data.result.sort((item_a, item_b) => {
-    let item_a_base_name;
-    let item_b_base_name;
-
-    item_a_base_name = item_a.name;
-    item_b_base_name = item_b.name;
-
-    if (item_a_base_name > item_b_base_name) {
-      return 1;
-    }
-    if (item_a_base_name < item_b_base_name) {
-      return -1;
-    }
-
-    return -1;
-  });
-
+  const sortedData = sortByClassifientNameAndName(data.result);
   tableData.splice(0);
-
-  data.result.forEach((item) => {
+  sortedData.forEach((item) => {
     tableData.push(item);
   });
 };
@@ -97,8 +126,11 @@ const fetchData = async () => {
       </el-col>
       <el-col :span="18">
         <el-table :data="tableData" stripe style="width: 100%">
+          <el-table-column prop="ingredientClassification.name" label="分類" />
           <el-table-column prop="name" label="名称" />
           <el-table-column prop="brewingUnit.name" label="使用単位" />
+          <el-table-column prop="recievingUnit.name" label="入荷単位" />
+          <el-table-column prop="stockingUnit.name" label="在庫単位" />
           <el-table-column>
             <template #default="scope">
               <el-button @click="onClickEdit(scope.$index, scope.row)"
@@ -118,6 +150,7 @@ const fetchData = async () => {
       <MasterIngredientFormVue
         :ingredientData="a_ingredientData"
         :unitMsts="unitMsts"
+        :ingredientClassificationMsts="ingredientClassificationMsts"
         @submitIngredient="onSubmitIngredient($event)"
         @clickCancel="onClickMasterIngredientFormCancel"
       >

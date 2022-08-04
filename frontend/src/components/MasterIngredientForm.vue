@@ -6,6 +6,7 @@ import { Ingredient } from "@/models/ingredient";
 const props = defineProps({
   ingredientData: Ingredient,
   unitMsts: [],
+  ingredientClassificationMsts: [],
 });
 
 const emit = defineEmits(["submitIngredient", "clickCancel"]);
@@ -44,6 +45,25 @@ const onCancel = () => {
   <el-form :model="form" :rules="rules" ref="formRef">
     <el-row>
       <el-col :span="24">
+        <el-form-item label="分類" :label-width="formLabelWidth">
+          <el-select
+            v-model="form.ingredientClassification"
+            value-key="id"
+            class="form-input"
+          >
+            <el-option
+              v-for="item in ingredientClassificationMsts"
+              :key="item.id"
+              :label="item.name"
+              :value="item"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-row>
+      <el-col :span="24">
         <el-form-item label="名称" :label-width="formLabelWidth" prop="name">
           <el-input v-model="form.name" autocomplete="off" />
         </el-form-item>
@@ -54,6 +74,44 @@ const onCancel = () => {
         <el-form-item label="使用単位" :label-width="formLabelWidth">
           <el-select
             v-model="form.brewingUnit"
+            value-key="id"
+            class="form-input"
+          >
+            <el-option
+              v-for="item in unitMsts"
+              :key="item.id"
+              :label="item.name"
+              :value="item"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-row>
+      <el-col :span="24">
+        <el-form-item label="入荷単位" :label-width="formLabelWidth">
+          <el-select
+            v-model="form.recievingUnit"
+            value-key="id"
+            class="form-input"
+          >
+            <el-option
+              v-for="item in unitMsts"
+              :key="item.id"
+              :label="item.name"
+              :value="item"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-row>
+      <el-col :span="24">
+        <el-form-item label="在庫単位" :label-width="formLabelWidth">
+          <el-select
+            v-model="form.stockingUnit"
             value-key="id"
             class="form-input"
           >

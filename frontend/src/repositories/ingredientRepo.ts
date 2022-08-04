@@ -79,7 +79,10 @@ export async function save(ingredient: Ingredient): Promise<{ id: string }> {
   try {
     const doc = await getDBInstance().get<IngredientMember>(id);
     doc.name = ingredient.name;
+    doc.ingredientClassification = ingredient.ingredientClassification;
     doc.brewingUnit = ingredient.brewingUnit;
+    doc.recievingUnit = ingredient.recievingUnit;
+    doc.stockingUnit = ingredient.stockingUnit;
     try {
       await getDBInstance().put(instanceToPlain(doc));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -96,7 +99,10 @@ export async function save(ingredient: Ingredient): Promise<{ id: string }> {
         type: typename,
         id: id,
         name: ingredient.name,
+        ingredientClassification: ingredient.ingredientClassification,
         brewingUnit: ingredient.brewingUnit,
+        recievingUnit: ingredient.recievingUnit,
+        stockingUnit: ingredient.stockingUnit,
       };
       try {
         await getDBInstance().put(instanceToPlain(doc));
