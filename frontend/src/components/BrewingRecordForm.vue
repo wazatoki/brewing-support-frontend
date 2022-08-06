@@ -27,8 +27,7 @@ const plan = reactive(
   new BrewPlan(
     props.brewPlan.id,
     props.brewPlan.batchNumber,
-    props.brewPlan.name,
-    props.brewPlan.events
+    props.brewPlan.name
   )
 );
 
@@ -39,8 +38,7 @@ const form = reactive(
     props.brewEvent.desc,
     props.brewEvent.from,
     props.brewEvent.to,
-    props.brewEvent.ingredients,
-    props.brewEvent.brewPlan
+    props.brewEvent.ingredients
   )
 );
 const formLabelWidth = "140px";
@@ -49,7 +47,6 @@ watch(props.brewPlan, (n) => {
   plan.id = n.id;
   plan.batchNumber = n.batchNumber;
   plan.name = n.name;
-  plan.events = n.events;
 });
 
 watch(props.brewEvent, (n) => {
@@ -59,7 +56,6 @@ watch(props.brewEvent, (n) => {
   form.from = n.from;
   form.to = n.to;
   form.ingredients = n.ingredients;
-  form.brewPlan = n.brewPlan;
 });
 
 const addIngredient = () => {
@@ -84,7 +80,7 @@ const onSubmit = () => {
       form.from,
       form.to,
       form.ingredients,
-      form.brewPlan
+      plan.id
     )
   );
 };

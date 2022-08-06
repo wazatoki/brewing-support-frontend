@@ -8,7 +8,7 @@ import BrewingRecordForm from "@/components/BrewingRecordForm.vue";
 import BrewingRecordSelect from "@/components/BrewingRecordSelect.vue";
 import { BrewEvent } from "@/models/brewEvent";
 import { BrewPlan } from "@/models/brewPlan";
-import { reactive, ref } from "vue";
+import { reactive, ref, onMounted } from "vue";
 import {
   ElRow,
   ElCol,
@@ -17,6 +17,10 @@ import {
   ElInput,
   ElDialog,
 } from "element-plus/dist/index.full.js";
+import * as ingredientRepo from "@/repositories/ingredientRepo";
+import * as ingredientService from "@/services/ingredient";
+import * as brewEventRepo from "@/repositories/brewEventRepo";
+import { ElMessageBox } from "element-plus";
 
 const formLabelWidth = "140px";
 const brewPlan = reactive(new BrewPlan());
@@ -56,6 +60,8 @@ const calendarOptions = reactive({
   eventResize: onChangeCalendarEvent,
 });
 
+const itemMsts = reactive([]);
+
 const brewEventDialogVisible = ref(false);
 const brewPlanDialogVisible = ref(true);
 const brewEvents = [];
@@ -73,6 +79,7 @@ function onSelectCalender(info) {
     a_brewEvent.desc = "";
     a_brewEvent.from = info.start;
     a_brewEvent.to = info.end;
+    a_brewEvent.brewPlanID = brewPlan.id;
     brewEventDialogVisible.value = true; // 編集用ダイアログを開く
   });
 }
@@ -87,6 +94,7 @@ function onClickCalenderEvent(info) {
     a_brewEvent.desc = brewEvent.desc;
     a_brewEvent.from = brewEvent.from;
     a_brewEvent.to = brewEvent.to;
+    a_brewEvent.brewPlanID = brewEvent.brewPlanID;
     brewEventDialogVisible.value = true;
   }
 }
@@ -94,9 +102,10 @@ function onClickCalenderEvent(info) {
 function onSubmitBrewEvent(submitedBrewEvent) {
   brewEventDialogVisible.value = false; // 編集用ダイアログを閉じる
 
-  // db送信
-
-  // calenderEvent更新処理
+  try {
+    // db送信
+    await brewEventRepo.save(submitedBrewEvent)
+    // calenderEvent更新処理
   const calenderEvent = {
     id: submitedBrewEvent.id,
     title: submitedBrewEvent.name,
@@ -116,11 +125,14 @@ function onSubmitBrewEvent(submitedBrewEvent) {
   }
 
   // brewEvent更新処理
-  const beIndex = brewEvents.findIndex((e) => e.id === submitedBrewEvent.id);
-  if (beIndex >= 0) {
-    brewEvents.splice(beIndex, 1);
+  fetchBrewEvents();
+
+  } catch (error) {
+    ElMessageBox.alert("データの保存に失敗しました。" + error.message, {
+      confirmButtonText: "OK",
+    });
   }
-  brewEvents.push(submitedBrewEvent);
+
 }
 
 function onChangeCalendarEvent(info) {
@@ -133,6 +145,12 @@ function onChangeCalendarEvent(info) {
     if (info.event.end) {
       be.to = info.event.end;
     }
+
+    // db送信
+    await brewEventRepo.save(be);
+    // brewEvent更新処理
+    fetchBrewEvents();
+
   }
 }
 
@@ -156,56 +174,32 @@ function onClickBrewingRecordFormCancel() {
   brewEventDialogVisible.value = false;
 }
 
-const itemMsts = [
-  {
-    id: "item-1",
-    name: "item-1-name",
-    brewingUnit: {
-      id: "unit-1",
-      name: "g",
-      conversionFactor: 1,
-    },
-    shippingUnit: {
-      id: "unit-2",
-      name: "Kg",
-      conversionFactor: 1000,
-    },
-    stockUnit: {
-      id: "unit-1",
-      name: "g",
-      conversionFactor: 1,
-    },
-    baseUnit: {
-      id: "unit-1",
-      name: "g",
-      conversionFactor: 1,
-    },
-  },
-  {
-    id: "item-2",
-    name: "item-2-name",
-    brewingUnit: {
-      id: "unit-1",
-      name: "Kg",
-      conversionFactor: 1,
-    },
-    shippingUnit: {
-      id: "unit-2",
-      name: "Kg",
-      conversionFactor: 1000,
-    },
-    stockUnit: {
-      id: "unit-1",
-      name: "g",
-      conversionFactor: 1,
-    },
-    baseUnit: {
-      id: "unit-1",
-      name: "g",
-      conversionFactor: 1,
-    },
-  },
-];
+const fetchBrewEvents = async () => {
+  if (brewPlan.id) {
+    const fetchedBrewEvents =  (await brewEventRepo.fetchAll()).result;
+    brewEvents.splice(0);
+    const filteredBrewEvents = fetchedBrewEvents.filter( brewEvent => {
+      return brewEvent.brewPlanID === brewPlan.id;
+    });
+    filteredBrewEvents.forEach( item => {
+      brewEvents.push(item);
+    })
+  }
+}
+
+onMounted(() => {
+  fetchIngredientMst();
+});
+
+const fetchIngredientMst = async () => {
+  const fetchedData = (await ingredientRepo.fetchAll()).result;
+  const sortedData =
+    ingredientService.sortByClassifientNameAndName(fetchedData);
+  sortedData.forEach((item) => {
+    itemMsts.splice(0);
+    itemMsts.push(item);
+  });
+};
 </script>
 
 <template>
