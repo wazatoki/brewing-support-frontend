@@ -3,7 +3,7 @@ import { createUUID } from "@/services/utils";
 import getDBInstance from "./pouchdb";
 import { instanceToPlain } from "class-transformer";
 
-const typename = "ingredient";
+const typename = "brew_event";
 const prefix = typename + "-";
 
 export async function fetchAll(): Promise<{

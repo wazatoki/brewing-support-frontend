@@ -28,8 +28,7 @@ describe("brewEventRepo.ts", () => {
 
     const be = new BrewEvent();
 
-    const result = await save(be);
-    expect(result.err).toEqual(null);
+    await save(be);
     expect(mockedPouchDbConfig.put).toBeCalled();
   });
 
@@ -42,8 +41,12 @@ describe("brewEventRepo.ts", () => {
 
     const be = new BrewEvent();
 
-    const result = await save(be);
-    expect(result.err).toEqual(new Error("db error"));
+    try {
+      await save(be);
+    } catch (e) {
+      expect(e).toEqual(new Error("db error"));
+    }
+
     expect(mockedPouchDbConfig.put).toBeCalled();
   });
 });

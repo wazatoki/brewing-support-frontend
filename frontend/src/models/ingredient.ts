@@ -28,7 +28,10 @@ export class Ingredient {
   clear() {
     this.id = "";
     this.name = "";
+    this.ingredientClassification = new IngredientClassification();
     this.brewingUnit = new Unit();
+    this.recievingUnit = new Unit();
+    this.stockingUnit = new Unit();
   }
 
   isReferenceUnit(unit: Unit) {

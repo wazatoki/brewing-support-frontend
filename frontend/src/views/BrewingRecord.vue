@@ -99,43 +99,41 @@ function onClickCalenderEvent(info) {
   }
 }
 
-function onSubmitBrewEvent(submitedBrewEvent) {
+async function onSubmitBrewEvent(submitedBrewEvent) {
   brewEventDialogVisible.value = false; // 編集用ダイアログを閉じる
 
   try {
     // db送信
-    await brewEventRepo.save(submitedBrewEvent)
+    await brewEventRepo.save(submitedBrewEvent);
     // calenderEvent更新処理
-  const calenderEvent = {
-    id: submitedBrewEvent.id,
-    title: submitedBrewEvent.name,
-    start: submitedBrewEvent.from,
-    end: submitedBrewEvent.to,
-  };
+    const calenderEvent = {
+      id: submitedBrewEvent.id,
+      title: submitedBrewEvent.name,
+      start: submitedBrewEvent.from,
+      end: submitedBrewEvent.to,
+    };
 
-  const event = calendarApi.getEventById(submitedBrewEvent.id);
+    const event = calendarApi.getEventById(submitedBrewEvent.id);
 
-  if (event) {
-    // 更新の場合
-    event.remove();
-    calendarApi.addEvent(calenderEvent);
-  } else {
-    // 新規作成の場合
-    calendarApi.addEvent(calenderEvent);
-  }
+    if (event) {
+      // 更新の場合
+      event.remove();
+      calendarApi.addEvent(calenderEvent);
+    } else {
+      // 新規作成の場合
+      calendarApi.addEvent(calenderEvent);
+    }
 
-  // brewEvent更新処理
-  fetchBrewEvents();
-
+    // brewEvent更新処理
+    fetchBrewEvents();
   } catch (error) {
     ElMessageBox.alert("データの保存に失敗しました。" + error.message, {
       confirmButtonText: "OK",
     });
   }
-
 }
 
-function onChangeCalendarEvent(info) {
+async function onChangeCalendarEvent(info) {
   const be = brewEvents.find((brewEvent) => brewEvent.id === info.event.id);
   if (be) {
     be.name = info.event.title;
@@ -150,7 +148,6 @@ function onChangeCalendarEvent(info) {
     await brewEventRepo.save(be);
     // brewEvent更新処理
     fetchBrewEvents();
-
   }
 }
 
@@ -176,16 +173,16 @@ function onClickBrewingRecordFormCancel() {
 
 const fetchBrewEvents = async () => {
   if (brewPlan.id) {
-    const fetchedBrewEvents =  (await brewEventRepo.fetchAll()).result;
+    const fetchedBrewEvents = (await brewEventRepo.fetchAll()).result;
     brewEvents.splice(0);
-    const filteredBrewEvents = fetchedBrewEvents.filter( brewEvent => {
+    const filteredBrewEvents = fetchedBrewEvents.filter((brewEvent) => {
       return brewEvent.brewPlanID === brewPlan.id;
     });
-    filteredBrewEvents.forEach( item => {
+    filteredBrewEvents.forEach((item) => {
       brewEvents.push(item);
-    })
+    });
   }
-}
+};
 
 onMounted(() => {
   fetchIngredientMst();
@@ -195,8 +192,8 @@ const fetchIngredientMst = async () => {
   const fetchedData = (await ingredientRepo.fetchAll()).result;
   const sortedData =
     ingredientService.sortByClassifientNameAndName(fetchedData);
+  itemMsts.splice(0);
   sortedData.forEach((item) => {
-    itemMsts.splice(0);
     itemMsts.push(item);
   });
 };
