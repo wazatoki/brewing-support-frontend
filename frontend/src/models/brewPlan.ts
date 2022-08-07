@@ -13,3 +13,10 @@ export class BrewPlan {
     this.events = events;
   }
 }
+
+export interface BrewPlanMember {
+  id: string;
+  batchNumber: number;
+  name: string;
+  events: BrewEvent[];
+}

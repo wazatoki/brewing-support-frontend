@@ -5,7 +5,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import BrewingRecordForm from "@/components/BrewingRecordForm.vue";
-import BrewingRecordSelect from "@/components/BrewingRecordSelect.vue";
+import BrewingPlanForm from "@/components/BrewingPlanForm.vue";
 import { BrewEvent } from "@/models/brewEvent";
 import { BrewPlan } from "@/models/brewPlan";
 import { reactive, ref, onMounted } from "vue";
@@ -21,25 +21,30 @@ import * as ingredientRepo from "@/repositories/ingredientRepo";
 import * as ingredientService from "@/services/ingredient";
 import * as brewEventRepo from "@/repositories/brewEventRepo";
 import { ElMessageBox } from "element-plus";
+import * as brewPlanRepo from "@/repositories/brewPlanRepo";
+import * as brewPlanService from "@/services/brewPlan";
+import BrewingPlanSelectForm from "@/components/BrewingPlanSelectForm.vue";
 
 const formLabelWidth = "140px";
+const brewPlans = reactive([]);
 const brewPlan = reactive(new BrewPlan());
+const brewPlanSelectFormDialogVisible = ref(false);
 const brewPlanformRef = ref();
 
-function brewPlanformVallidate(formEl, callback) {
-  if (!formEl) return;
-  formEl.validate((valid) => {
-    if (valid) {
-      if (callback) {
-        callback();
-      }
-      console.log("form vallidate true");
-    } else {
-      console.log("form vallidate false");
-      return false;
-    }
-  });
-}
+// function brewPlanformVallidate(formEl, callback) {
+//   if (!formEl) return;
+//   formEl.validate((valid) => {
+//     if (valid) {
+//       if (callback) {
+//         callback();
+//       }
+//       console.log("form vallidate true");
+//     } else {
+//       console.log("form vallidate false");
+//       return false;
+//     }
+//   });
+// }
 
 const calendarOptions = reactive({
   plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
@@ -63,7 +68,7 @@ const calendarOptions = reactive({
 const itemMsts = reactive([]);
 
 const brewEventDialogVisible = ref(false);
-const brewPlanDialogVisible = ref(true);
+const brewPlanFormDialogVisible = ref(false);
 const brewEvents = [];
 const a_brewEvent = reactive(new BrewEvent());
 
@@ -73,7 +78,7 @@ function onSelectCalender(info) {
   calendarApi = info.view.calendar;
   calendarApi.unselect(); // clear date selection
 
-  brewPlanformVallidate(brewPlanformRef.value, () => {
+  if (brewPlan.id) {
     a_brewEvent.id = "";
     a_brewEvent.name = "";
     a_brewEvent.desc = "";
@@ -81,8 +86,22 @@ function onSelectCalender(info) {
     a_brewEvent.to = info.end;
     a_brewEvent.brewPlanID = brewPlan.id;
     brewEventDialogVisible.value = true; // 編集用ダイアログを開く
-  });
+  } else {
+    ElMessageBox.alert("brew planを選択してください。", {
+      confirmButtonText: "OK",
+    });
+  }
 }
+//   brewPlanformVallidate(brewPlanformRef.value, () => {
+//     a_brewEvent.id = "";
+//     a_brewEvent.name = "";
+//     a_brewEvent.desc = "";
+//     a_brewEvent.from = info.start;
+//     a_brewEvent.to = info.end;
+//     a_brewEvent.brewPlanID = brewPlan.id;
+//     brewEventDialogVisible.value = true; // 編集用ダイアログを開く
+//   });
+// }
 
 function onClickCalenderEvent(info) {
   const brewEvent = brewEvents.find(
@@ -186,6 +205,7 @@ const fetchBrewEvents = async () => {
 
 onMounted(() => {
   fetchIngredientMst();
+  fetchBrewPlans();
 });
 
 const fetchIngredientMst = async () => {
@@ -197,15 +217,93 @@ const fetchIngredientMst = async () => {
     itemMsts.push(item);
   });
 };
+
+const onClickBrewPlanCreate = () => {
+  brewPlan.id = "";
+  brewPlan.batchNumber = "";
+  brewPlan.name = "";
+  brewPlan.events = [];
+  brewPlanFormDialogVisible.value = true;
+};
+
+const onClickCancelBrewPlanForm = () => {
+  brewPlanFormDialogVisible.value = false;
+};
+
+const onClickSubmitBrewPlanForm = async (brewPlanData) => {
+  brewPlanFormDialogVisible.value = false;
+  try {
+    const id = await brewPlanRepo.save(brewPlanData);
+    brewPlan.id = id;
+    brewPlan.batchNumber = brewPlanData.batchNumber;
+    brewPlan.name = brewPlanData.name;
+    brewPlan.events = brewPlanData.events;
+    fetchBrewPlans();
+    ElMessageBox.alert("データの保存に成功しました。", {
+      confirmButtonText: "OK",
+    });
+  } catch (error) {
+    ElMessageBox.alert("データの保存に失敗しました。" + error.message, {
+      confirmButtonText: "OK",
+    });
+  }
+};
+
+const fetchBrewPlans = async () => {
+  const fetchedData = (await brewPlanRepo.fetchAll()).result;
+  const sortedData = brewPlanService.sortByBatchNumber(fetchedData);
+  brewPlans.splice(0);
+  sortedData.forEach((item) => {
+    brewPlans.push(item);
+  });
+  console.log(brewPlans);
+};
+
+const onClickBrewPlanSelect = () => {
+  brewPlanSelectFormDialogVisible.value = true;
+};
+
+const onSelectBrewPlan = (selectedBrewPlan) => {
+  brewPlan.id = selectedBrewPlan.id;
+  brewPlan.batchNumber = selectedBrewPlan.batchNumber;
+  brewPlan.name = selectedBrewPlan.name;
+  brewPlan.events = selectedBrewPlan.events;
+  brewPlanSelectFormDialogVisible.value = false;
+};
 </script>
 
 <template>
   <div class="brewing-record">
     <el-row>
       <el-col :span="12">
-        <div>brew plan</div>
+        <el-row>
+          <el-col :span="12"> brew plan </el-col>
+          <el-col :span="6">
+            <el-button type="primary" @click="onClickBrewPlanCreate()"
+              >新規作成</el-button
+            >
+          </el-col>
+          <el-col :span="6">
+            <el-button type="primary" @click="onClickBrewPlanSelect()"
+              >変更</el-button
+            >
+          </el-col>
+        </el-row>
+
         <div>
-          <el-form ref="brewPlanformRef" :model="brewPlan">
+          <el-row>
+            <el-col :span="12"> batch number </el-col>
+            <el-col :span="12">
+              {{ brewPlan.batchNumber }}
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="12"> batch name </el-col>
+            <el-col :span="12">
+              {{ brewPlan.name }}
+            </el-col>
+          </el-row>
+          <!--<el-form ref="brewPlanformRef" :model="brewPlan">
             <el-row>
               <el-col :span="12">
                 <el-form-item
@@ -251,11 +349,13 @@ const fetchIngredientMst = async () => {
                 </el-form-item>
               </el-col>
             </el-row>
-          </el-form>
+          </el-form>-->
         </div>
       </el-col>
       <el-col :span="12">
-        <div>brew event</div>
+        <el-row>
+          <el-col :span="24">brew event</el-col>
+        </el-row>
         <div>
           <FullCalendar :options="calendarOptions" />
         </div>
@@ -272,8 +372,18 @@ const fetchIngredientMst = async () => {
       >
       </BrewingRecordForm>
     </el-dialog>
-    <!--<el-dialog v-model="brewPlanDialogVisible">
-      <BrewingRecordSelect :itemMsts="itemMsts"></BrewingRecordSelect>
-    </el-dialog>-->
+    <el-dialog v-model="brewPlanFormDialogVisible">
+      <BrewingPlanForm
+        :brewPlan="brewPlan"
+        @cancel="onClickCancelBrewPlanForm"
+        @submit="onClickSubmitBrewPlanForm"
+      ></BrewingPlanForm>
+    </el-dialog>
+    <el-dialog v-model="brewPlanSelectFormDialogVisible">
+      <BrewingPlanSelectForm
+        :brewPlans="brewPlans"
+        @selectBrewPlan="onSelectBrewPlan"
+      ></BrewingPlanSelectForm>
+    </el-dialog>
   </div>
 </template>

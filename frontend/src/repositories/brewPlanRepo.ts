@@ -1,18 +1,18 @@
-import { BrewEvent, BrewEventMember } from "@/models/brewEvent";
+import { BrewPlan, BrewPlanMember } from "@/models/brewPlan";
 import { createUUID } from "@/services/utils";
 import getDBInstance from "./pouchdb";
 import { instanceToPlain } from "class-transformer";
 
-const typename = "brew_event";
+const typename = "brew_plan";
 const prefix = typename + "-";
 
 export async function fetchAll(): Promise<{
-  result: BrewEvent[];
+  result: BrewPlan[];
 }> {
-  const result: BrewEvent[] = [];
+  const result: BrewPlan[] = [];
 
   try {
-    const fetchResult = await getDBInstance().allDocs<BrewEventMember>({
+    const fetchResult = await getDBInstance().allDocs<BrewPlanMember>({
       include_docs: true,
       startkey: prefix,
       endkey: prefix + "\ufff0",
@@ -22,7 +22,7 @@ export async function fetchAll(): Promise<{
       (item: {
         doc?:
           | PouchDB.Core.ExistingDocument<
-              BrewEventMember & PouchDB.Core.AllDocsMeta
+              BrewPlanMember & PouchDB.Core.AllDocsMeta
             >
           | undefined;
         id: string;
@@ -33,16 +33,13 @@ export async function fetchAll(): Promise<{
         };
       }) => {
         if (item.doc) {
-          const be = new BrewEvent(
+          const bp = new BrewPlan(
             item.doc.id,
+            item.doc.batchNumber,
             item.doc.name,
-            item.doc.desc,
-            item.doc.from,
-            item.doc.to,
-            item.doc.ingredients,
-            item.doc.brewPlanID
+            item.doc.events
           );
-          result.push(be);
+          result.push(bp);
         }
       }
     );
@@ -55,9 +52,9 @@ export async function fetchAll(): Promise<{
   return { result: result };
 }
 
-export async function remove(brewEvent: BrewEvent) {
+export async function remove(brewPlan: BrewPlan) {
   try {
-    const doc = await getDBInstance().get<BrewEventMember>(brewEvent.id);
+    const doc = await getDBInstance().get<BrewPlanMember>(brewPlan.id);
 
     try {
       await getDBInstance().remove(doc);
@@ -73,17 +70,14 @@ export async function remove(brewEvent: BrewEvent) {
   }
 }
 
-export async function save(brewEvent: BrewEvent): Promise<{ id: string }> {
-  const id = brewEvent.id || prefix + createUUID();
+export async function save(brewPlan: BrewPlan): Promise<{ id: string }> {
+  const id = brewPlan.id || prefix + createUUID();
 
   try {
-    const doc = await getDBInstance().get<BrewEvent>(id);
-    doc.name = brewEvent.name;
-    doc.desc = brewEvent.desc;
-    doc.from = brewEvent.from;
-    doc.to = brewEvent.to;
-    doc.ingredients = brewEvent.ingredients;
-    doc.brewPlanID = brewEvent.brewPlanID;
+    const doc = await getDBInstance().get<BrewPlan>(id);
+    doc.batchNumber = brewPlan.batchNumber;
+    doc.name = brewPlan.name;
+    doc.events = brewPlan.events;
     try {
       await getDBInstance().put(instanceToPlain(doc));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -97,14 +91,11 @@ export async function save(brewEvent: BrewEvent): Promise<{ id: string }> {
     if (e.name === "not_found") {
       const doc = {
         _id: id,
-        type: typename,
         id: id,
-        name: brewEvent.name,
-        desc: brewEvent.desc,
-        from: brewEvent.from,
-        to: brewEvent.to,
-        ingredients: brewEvent.ingredients,
-        brewPlanID: brewEvent.brewPlanID,
+        type: typename,
+        batchNumber: brewPlan.batchNumber,
+        name: brewPlan.name,
+        events: brewPlan.events,
       };
       try {
         await getDBInstance().put(instanceToPlain(doc));
