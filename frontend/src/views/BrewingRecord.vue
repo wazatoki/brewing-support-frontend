@@ -21,6 +21,7 @@ import BrewingPlanSelectForm from "@/components/BrewingPlanSelectForm.vue";
 const brewPlans = reactive([]);
 const brewPlan = reactive(new BrewPlan());
 const brewPlanSelectFormDialogVisible = ref(false);
+const calendarEvents = reactive([]);
 
 const calendarOptions = reactive({
   plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
@@ -35,6 +36,7 @@ const calendarOptions = reactive({
   selectMirror: true,
   dayMaxEvents: true,
   weekends: true,
+  events: calendarEvents,
   select: onSelectCalender,
   eventClick: onClickCalenderEvent,
   eventDrop: onChangeCalendarEvent,
@@ -90,24 +92,6 @@ async function onSubmitBrewEvent(submitedBrewEvent) {
   try {
     // db送信
     await brewEventRepo.save(submitedBrewEvent);
-    // calenderEvent更新処理
-    const calenderEvent = {
-      id: submitedBrewEvent.id,
-      title: submitedBrewEvent.name,
-      start: submitedBrewEvent.from,
-      end: submitedBrewEvent.to,
-    };
-
-    const event = calendarApi.getEventById(submitedBrewEvent.id);
-
-    if (event) {
-      // 更新の場合
-      event.remove();
-      calendarApi.addEvent(calenderEvent);
-    } else {
-      // 新規作成の場合
-      calendarApi.addEvent(calenderEvent);
-    }
 
     // brewEvent更新処理
     fetchBrewEvents();
@@ -160,11 +144,19 @@ const fetchBrewEvents = async () => {
   if (brewPlan.id) {
     const fetchedBrewEvents = (await brewEventRepo.fetchAll()).result;
     brewEvents.splice(0);
+    calendarEvents.splice(0);
     const filteredBrewEvents = fetchedBrewEvents.filter((brewEvent) => {
       return brewEvent.brewPlanID === brewPlan.id;
     });
     filteredBrewEvents.forEach((item) => {
+      const calenderEvent = {
+        id: item.id,
+        title: item.name,
+        start: item.from,
+        end: item.to,
+      };
       brewEvents.push(item);
+      calendarEvents.push(calenderEvent);
     });
   }
 };
@@ -222,7 +214,6 @@ const fetchBrewPlans = async () => {
   sortedData.forEach((item) => {
     brewPlans.push(item);
   });
-  console.log(brewPlans);
 };
 
 const onClickBrewPlanSelect = () => {
@@ -235,6 +226,7 @@ const onSelectBrewPlan = (selectedBrewPlan) => {
   brewPlan.name = selectedBrewPlan.name;
   brewPlan.events = selectedBrewPlan.events;
   brewPlanSelectFormDialogVisible.value = false;
+  fetchBrewEvents();
 };
 </script>
 
