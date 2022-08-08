@@ -9,14 +9,7 @@ import BrewingPlanForm from "@/components/BrewingPlanForm.vue";
 import { BrewEvent } from "@/models/brewEvent";
 import { BrewPlan } from "@/models/brewPlan";
 import { reactive, ref, onMounted } from "vue";
-import {
-  ElRow,
-  ElCol,
-  ElForm,
-  ElFormItem,
-  ElInput,
-  ElDialog,
-} from "element-plus/dist/index.full.js";
+import { ElRow, ElCol, ElDialog } from "element-plus/dist/index.full.js";
 import * as ingredientRepo from "@/repositories/ingredientRepo";
 import * as ingredientService from "@/services/ingredient";
 import * as brewEventRepo from "@/repositories/brewEventRepo";
@@ -25,26 +18,9 @@ import * as brewPlanRepo from "@/repositories/brewPlanRepo";
 import * as brewPlanService from "@/services/brewPlan";
 import BrewingPlanSelectForm from "@/components/BrewingPlanSelectForm.vue";
 
-const formLabelWidth = "140px";
 const brewPlans = reactive([]);
 const brewPlan = reactive(new BrewPlan());
 const brewPlanSelectFormDialogVisible = ref(false);
-const brewPlanformRef = ref();
-
-// function brewPlanformVallidate(formEl, callback) {
-//   if (!formEl) return;
-//   formEl.validate((valid) => {
-//     if (valid) {
-//       if (callback) {
-//         callback();
-//       }
-//       console.log("form vallidate true");
-//     } else {
-//       console.log("form vallidate false");
-//       return false;
-//     }
-//   });
-// }
 
 const calendarOptions = reactive({
   plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
@@ -92,16 +68,6 @@ function onSelectCalender(info) {
     });
   }
 }
-//   brewPlanformVallidate(brewPlanformRef.value, () => {
-//     a_brewEvent.id = "";
-//     a_brewEvent.name = "";
-//     a_brewEvent.desc = "";
-//     a_brewEvent.from = info.start;
-//     a_brewEvent.to = info.end;
-//     a_brewEvent.brewPlanID = brewPlan.id;
-//     brewEventDialogVisible.value = true; // 編集用ダイアログを開く
-//   });
-// }
 
 function onClickCalenderEvent(info) {
   const brewEvent = brewEvents.find(
@@ -303,53 +269,6 @@ const onSelectBrewPlan = (selectedBrewPlan) => {
               {{ brewPlan.name }}
             </el-col>
           </el-row>
-          <!--<el-form ref="brewPlanformRef" :model="brewPlan">
-            <el-row>
-              <el-col :span="12">
-                <el-form-item
-                  label="batch number"
-                  :label-width="formLabelWidth"
-                  prop="batchNumber"
-                  :rules="[
-                    {
-                      required: true,
-                      message: 'batch number is required',
-                    },
-                    {
-                      type: 'number',
-                      message: 'batch number must be a number',
-                    },
-                  ]"
-                >
-                  <el-input
-                    type="text"
-                    autocomplete="off"
-                    v-model.number="brewPlan.batchNumber"
-                    @blur="brewPlanformVallidate(brewPlanformRef)"
-                  />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item
-                  label="batch name"
-                  :label-width="formLabelWidth"
-                  prop="name"
-                  :rules="[
-                    { required: true, message: 'batch name is required' },
-                  ]"
-                >
-                  <el-input
-                    type="text"
-                    autocomplete="off"
-                    v-model="brewPlan.name"
-                    @blur="brewPlanformVallidate(brewPlanformRef)"
-                  />
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-form>-->
         </div>
       </el-col>
       <el-col :span="12">
