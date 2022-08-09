@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, watch } from "vue";
+import { onMounted, reactive, watch } from "vue";
 import BrewingRecordItem from "@/components/BrewingRecordItem.vue";
 import { BrewEvent } from "@/models/brewEvent";
 import { ConsumedIngredient } from "@/models/consumedIngredient";
@@ -31,16 +31,8 @@ const plan = reactive(
   )
 );
 
-const form = reactive(
-  new BrewEvent(
-    props.brewEvent.id,
-    props.brewEvent.name,
-    props.brewEvent.desc,
-    props.brewEvent.from,
-    props.brewEvent.to,
-    props.brewEvent.ingredients
-  )
-);
+const form = reactive(new BrewEvent());
+
 const formLabelWidth = "140px";
 
 watch(props.brewPlan, (n) => {
@@ -49,14 +41,18 @@ watch(props.brewPlan, (n) => {
   plan.name = n.name;
 });
 
-watch(props.brewEvent, (n) => {
-  form.id = n.id;
-  form.name = n.name;
-  form.desc = n.desc;
-  form.from = n.from;
-  form.to = n.to;
-  form.ingredients = n.ingredients;
-});
+watch(props.brewEvent, copyPropBrewEventToForm);
+
+copyPropBrewEventToForm(props.brewEvent);
+
+function copyPropBrewEventToForm(be) {
+  form.id = be.id;
+  form.name = be.name;
+  form.desc = be.desc;
+  form.from = be.from;
+  form.to = be.to;
+  form.ingredients = be.ingredients;
+}
 
 const addIngredient = () => {
   form.ingredients.push(new ConsumedIngredient("", props.itemMsts[0], 0));
