@@ -23,15 +23,10 @@ const props = defineProps({
 
 const emit = defineEmits(["submitBrewEvent", "clickCancel", "clickDelete"]);
 
-const plan = reactive(
-  new BrewPlan(
-    props.brewPlan.id,
-    props.brewPlan.batchNumber,
-    props.brewPlan.name
-  )
-);
+const plan = reactive(props.brewPlan);
 
-const form = reactive(new BrewEvent());
+//const form = reactive(new BrewEvent());
+const form = reactive(props.brewEvent);
 
 const formLabelWidth = "140px";
 
@@ -41,18 +36,17 @@ watch(props.brewPlan, (n) => {
   plan.name = n.name;
 });
 
-watch(props.brewEvent, copyPropBrewEventToForm);
+//watch(props.brewEvent, copyPropBrewEventToForm);
 
-copyPropBrewEventToForm(props.brewEvent);
-
-function copyPropBrewEventToForm(be) {
-  form.id = be.id;
-  form.name = be.name;
-  form.desc = be.desc;
-  form.from = be.from;
-  form.to = be.to;
-  form.ingredients = be.ingredients;
-}
+// function copyPropBrewEventToForm(be) {
+//   console.log(be);
+//   form.id = be.id;
+//   form.name = be.name;
+//   form.desc = be.desc;
+//   form.from = be.from;
+//   form.to = be.to;
+//   form.ingredients = be.ingredients;
+// }
 
 const addIngredient = () => {
   form.ingredients.push(new ConsumedIngredient("", props.itemMsts[0], 0));
@@ -142,7 +136,7 @@ const onDelete = () => {
     </el-row>
     <el-row>
       <el-col :span="4">
-        <el-button type="primary" @click="addIngredient">追加</el-button>
+        <el-button type="primary" @click="addIngredient">Add</el-button>
       </el-col>
     </el-row>
     <BrewingRecordItem

@@ -9,6 +9,16 @@ export class BrewEvent {
   ingredients: ConsumedIngredient[];
   brewPlanID: string;
 
+  clear() {
+    this.id = "";
+    this.name = "";
+    this.desc = "";
+    this.from = new Date();
+    this.to = new Date();
+    this.ingredients = [] as ConsumedIngredient[];
+    this.brewPlanID = "";
+  }
+
   constructor(
     id = "",
     name = "",

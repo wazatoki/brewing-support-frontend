@@ -57,9 +57,7 @@ function onSelectCalender(info) {
   calendarApi.unselect(); // clear date selection
 
   if (brewPlan.id) {
-    a_brewEvent.id = "";
-    a_brewEvent.name = "";
-    a_brewEvent.desc = "";
+    a_brewEvent.clear();
     a_brewEvent.from = info.start;
     a_brewEvent.to = info.end;
     a_brewEvent.brewPlanID = brewPlan.id;
@@ -81,6 +79,7 @@ function onClickCalenderEvent(info) {
     a_brewEvent.desc = brewEvent.desc;
     a_brewEvent.from = brewEvent.from;
     a_brewEvent.to = brewEvent.to;
+    a_brewEvent.ingredients = brewEvent.ingredients;
     a_brewEvent.brewPlanID = brewEvent.brewPlanID;
     brewEventDialogVisible.value = true;
   }
@@ -197,6 +196,7 @@ const onClickSubmitBrewPlanForm = async (brewPlanData) => {
     brewPlan.name = brewPlanData.name;
     brewPlan.events = brewPlanData.events;
     fetchBrewPlans();
+    fetchBrewEvents();
     ElMessageBox.alert("データの保存に成功しました。", {
       confirmButtonText: "OK",
     });

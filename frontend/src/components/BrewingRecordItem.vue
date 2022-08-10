@@ -35,11 +35,14 @@ const onChange = () => {
 };
 
 const emitData = () => {
-  emit("update:brewingItemData", {
-    id: props.brewingItemData.id,
-    item: props.itemMsts.find((item) => item.id === selectedItemID.value),
-    quantity: quantity.value,
-  });
+  emit(
+    "update:brewingItemData",
+    new ConsumedIngredient(
+      props.brewingItemData.id,
+      props.itemMsts.find((item) => item.id === selectedItemID.value),
+      quantity.value
+    )
+  );
 };
 
 const clickDelete = () => {
