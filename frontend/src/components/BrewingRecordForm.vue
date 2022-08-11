@@ -50,7 +50,6 @@ const formLabelWidth = "140px";
 
 const addIngredient = () => {
   form.ingredients.push(new ConsumedIngredient("", props.itemMsts[0], 0));
-  console.log(form.ingredients);
 };
 
 const updateBrewingItemData = (brewingItemData, index) => {
