@@ -1,5 +1,6 @@
 import { Ingredient } from "./ingredient";
 import { Unit } from "./unit";
+import { createUUID } from "@/services/utils";
 
 export class ConsumedIngredient {
   id: string;
@@ -11,7 +12,7 @@ export class ConsumedIngredient {
   }
 
   constructor(id = "", ingredient: Ingredient, quantity = 0) {
-    this.id = id;
+    this.id = id || "consumed_ingredient-" + createUUID();
     this.ingredient = ingredient;
     this.quantity = quantity;
   }

@@ -30,11 +30,11 @@ const form = reactive(props.brewEvent);
 
 const formLabelWidth = "140px";
 
-watch(props.brewPlan, (n) => {
-  plan.id = n.id;
-  plan.batchNumber = n.batchNumber;
-  plan.name = n.name;
-});
+// watch(props.brewPlan, (n) => {
+//   plan.id = n.id;
+//   plan.batchNumber = n.batchNumber;
+//   plan.name = n.name;
+// });
 
 //watch(props.brewEvent, copyPropBrewEventToForm);
 
@@ -50,6 +50,7 @@ watch(props.brewPlan, (n) => {
 
 const addIngredient = () => {
   form.ingredients.push(new ConsumedIngredient("", props.itemMsts[0], 0));
+  console.log(form.ingredients);
 };
 
 const updateBrewingItemData = (brewingItemData, index) => {

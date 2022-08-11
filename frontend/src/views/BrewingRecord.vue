@@ -57,7 +57,7 @@ function onSelectCalender(info) {
   calendarApi.unselect(); // clear date selection
 
   if (brewPlan.id) {
-    a_brewEvent.clear();
+    brewEventClear();
     a_brewEvent.from = info.start;
     a_brewEvent.to = info.end;
     a_brewEvent.brewPlanID = brewPlan.id;
@@ -69,7 +69,12 @@ function onSelectCalender(info) {
   }
 }
 
-function onClickCalenderEvent(info) {
+function brewEventClear() {
+  a_brewEvent.clear();
+}
+
+async function onClickCalenderEvent(info) {
+  await fetchBrewEvents();
   const brewEvent = brewEvents.find(
     (calenderEvent) => calenderEvent.id === info.event.id
   );
@@ -272,7 +277,7 @@ const onSelectBrewPlan = (selectedBrewPlan) => {
         </div>
       </el-col>
     </el-row>
-    <el-dialog v-model="brewEventDialogVisible">
+    <el-dialog v-model="brewEventDialogVisible" @close="brewEventClear">
       <BrewingRecordForm
         :brewEvent="a_brewEvent"
         :brewPlan="brewPlan"
