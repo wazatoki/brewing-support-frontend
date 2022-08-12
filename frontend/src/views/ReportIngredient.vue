@@ -39,6 +39,7 @@ const onChangeIngredientClassification = () => {
   filterdIngredients.forEach((item) => {
     ingredients.push(item);
   });
+  tableData.splice(0);
 };
 
 const onChangeIngredient = () => {
