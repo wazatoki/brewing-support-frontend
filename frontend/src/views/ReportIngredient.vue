@@ -59,37 +59,43 @@ const onChangeIngredient = () => {
 <template>
   <div class="report-ingredient">
     <el-row>
-      <el-radio-group
-        v-model="selectedIngredientClassificationID"
-        @change="onChangeIngredientClassification"
-      >
-        <el-radio
-          v-for="ingredientClassification in ingredientClassifications"
-          :key="ingredientClassification.id"
-          :label="ingredientClassification.id"
-          >{{ ingredientClassification.name }}</el-radio
-        >
-      </el-radio-group>
-    </el-row>
-    <el-row>
-      <el-radio-group
-        v-model="selectedIngredientID"
-        @change="onChangeIngredient"
-      >
-        <el-radio
-          v-for="ingredient in ingredients"
-          :key="ingredient.id"
-          :label="ingredient.id"
-          >{{ ingredient.name }}</el-radio
-        >
-      </el-radio-group>
-    </el-row>
-    <el-row>
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="fromDate" label="日付" width="180" />
-        <el-table-column prop="ingredient.name" label="名称" width="180" />
-        <el-table-column prop="quantity" label="使用数" />
-      </el-table>
+      <el-col :span="6">
+        <el-row>
+          <el-radio-group
+            v-model="selectedIngredientClassificationID"
+            @change="onChangeIngredientClassification"
+          >
+            <el-radio
+              v-for="ingredientClassification in ingredientClassifications"
+              :key="ingredientClassification.id"
+              :label="ingredientClassification.id"
+              >{{ ingredientClassification.name }}</el-radio
+            >
+          </el-radio-group>
+        </el-row>
+        <el-row>
+          <el-radio-group
+            v-model="selectedIngredientID"
+            @change="onChangeIngredient"
+          >
+            <el-radio
+              v-for="ingredient in ingredients"
+              :key="ingredient.id"
+              :label="ingredient.id"
+              >{{ ingredient.name }}</el-radio
+            >
+          </el-radio-group>
+        </el-row>
+      </el-col>
+      <el-col :span="18">
+        <el-row>
+          <el-table :data="tableData" style="width: 100%">
+            <el-table-column prop="fromDate" label="日付" width="180" />
+            <el-table-column prop="ingredient.name" label="名称" width="180" />
+            <el-table-column prop="quantity" label="使用数" />
+          </el-table>
+        </el-row>
+      </el-col>
     </el-row>
   </div>
 </template>
