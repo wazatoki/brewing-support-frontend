@@ -20,6 +20,7 @@
     "axios": "^0.27.2",
     "class-transformer": "^0.5.1",
     "core-js": "^3.8.3",
+    "dayjs": "^1.11.4",
     "element-plus": "^2.2.6",
     "pouchdb": "^7.3.0",
     "reflect-metadata": "^0.1.13",

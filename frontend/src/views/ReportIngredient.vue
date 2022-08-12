@@ -3,6 +3,7 @@ import { onMounted, reactive, ref } from "vue";
 import * as brewEventRepo from "@/repositories/brewEventRepo";
 import * as ingredientRepo from "@/repositories/ingredientRepo";
 import * as ingredientClassificationRepo from "@/repositories/ingredientClassificationRepo";
+import dayjs from "dayjs";
 
 const ingredientClassifications = reactive([]);
 const ingredients = reactive([]);
@@ -54,6 +55,9 @@ const onChangeIngredient = () => {
     });
   });
 };
+
+const formatDate = (row, column, cellValue) =>
+  dayjs(cellValue).format("YYYY/MM/DD HH:mm");
 </script>
 
 <template>
@@ -90,7 +94,12 @@ const onChangeIngredient = () => {
       <el-col :span="18">
         <el-row>
           <el-table :data="tableData" style="width: 100%">
-            <el-table-column prop="fromDate" label="日付" width="180" />
+            <el-table-column
+              prop="fromDate"
+              :formatter="formatDate"
+              label="日付"
+              width="180"
+            />
             <el-table-column prop="ingredient.name" label="名称" width="180" />
             <el-table-column prop="quantity" label="使用数" />
           </el-table>
