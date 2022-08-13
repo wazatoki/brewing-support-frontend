@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, watch } from "vue";
 import StocksRecievingItem from "@/components/StocksRecievingItem.vue";
 import { RecieveEvent } from "@/models/recieveEvent";
 import { RecievedIngredient } from "@/models/recievedIngredient";
@@ -25,6 +25,9 @@ const emit = defineEmits(["clickSubmit", "clickCancel", "clickDelete"]);
 
 const form = reactive(props.recieveEventData);
 const selectedSupplierID = ref(props.recieveEventData.supplier.id);
+watch(props.recieveEventData, (a) => {
+  selectedSupplierID.value = a.supplier.id;
+});
 
 const formLabelWidth = "140px";
 
@@ -47,7 +50,7 @@ const onSubmit = () => {
       form.id,
       form.noteNO,
       form.noteDate,
-      form.supplier,
+      props.suppliers.find((item) => item.id === selectedSupplierID.value),
       form.recieveDate,
       form.ingredients,
       form.footNote
@@ -66,7 +69,7 @@ const onDelete = () => {
       form.id,
       form.noteNO,
       form.noteDate,
-      form.supplier,
+      props.suppliers.find((item) => item.id === selectedSupplierID.value),
       form.recieveDate,
       form.ingredients,
       form.footNote
@@ -74,13 +77,13 @@ const onDelete = () => {
   );
 };
 
-const onSupplierChange = () => {
-  const supplier = props.suppliers.find(
-    (item) => item.id === selectedSupplierID.value
-  );
+// const onSupplierChange = () => {
+//   const supplier = props.suppliers.find(
+//     (item) => item.id === selectedSupplierID.value
+//   );
 
-  form.supplier = supplier;
-};
+//   form.supplier = supplier;
+// };
 </script>
 
 <template>
