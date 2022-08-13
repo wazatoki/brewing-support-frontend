@@ -11,7 +11,7 @@
         ><router-link to="/brewing-record">醸造記録</router-link></el-menu-item
       >
       <el-menu-item index="3"
-        ><router-link to="/stocks/recieving">入荷</router-link></el-menu-item
+        ><router-link to="/stocks-recieving">入荷</router-link></el-menu-item
       >
       <el-menu-item index="4"
         ><router-link to="/report-ingredient">Report</router-link></el-menu-item
@@ -28,6 +28,9 @@
         >
         <el-menu-item index="5-3"
           ><router-link to="/master-unit">単位</router-link></el-menu-item
+        >
+        <el-menu-item index="5-4"
+          ><router-link to="/master-supplier">取引先</router-link></el-menu-item
         >
       </el-sub-menu>
     </el-menu>

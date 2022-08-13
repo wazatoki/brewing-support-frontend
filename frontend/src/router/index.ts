@@ -4,7 +4,9 @@ import BrewingRecord from "@/views/BrewingRecord.vue";
 import MasterUnit from "@/views/MasterUnit.vue";
 import MasterIngredient from "@/views/MasterIngredient.vue";
 import MasterIngredientClassification from "@/views/MasterIngredientClassification.vue";
+import MasterSupplier from "@/views/MasterSupplier.vue";
 import ReportIngredient from "@/views/ReportIngredient.vue";
+import StocksRecieving from "@/views/StocksRecieving.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -42,9 +44,20 @@ const routes: Array<RouteRecordRaw> = [
     component: MasterIngredientClassification,
   },
   {
+    path: "/master-supplier",
+    name: "supplierMaster",
+    component: MasterSupplier,
+  },
+
+  {
     path: "/report-ingredient",
     name: "ingredientReport",
     component: ReportIngredient,
+  },
+  {
+    path: "stocks-recieving",
+    name: "recievedIngredient",
+    component: StocksRecieving,
   },
 ];
 
