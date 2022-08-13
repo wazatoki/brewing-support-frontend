@@ -38,7 +38,7 @@ const emitData = () => {
   emit(
     "update:stockRecievingItemData",
     new RecievedIngredient(
-      props.brewingItemData.id,
+      props.stockRecievingItemData.id,
       props.itemMsts.find((item) => item.id === selectedItemID.value),
       quantity.value
     )

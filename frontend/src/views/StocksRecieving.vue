@@ -1,12 +1,18 @@
 <script setup>
 import { fetchAll, save, remove } from "@/repositories/recieveEventRepo";
+import * as ingredientRepo from "@/repositories/ingredientRepo";
+import * as supplierRepo from "@/repositories/supplierRepo";
 import { reactive, ref, onMounted } from "vue";
 import StocksRecievingForm from "@/components/StocksRecievingForm.vue";
 import { RecieveEvent } from "@/models/recieveEvent";
 import { sortBySupplierNameAndRecieveDate } from "@/services/recieveEvent";
+import * as supplierServices from "@/services/supplier";
+import * as ingredientService from "@/services/ingredient";
 import { ElMessageBox } from "element-plus";
 import dayjs from "dayjs";
 
+const suppliers = reactive([]);
+const ingredientMsts = reactive([]);
 const tableData = reactive([]);
 const recieveEventData = reactive(new RecieveEvent());
 const StocksRecievingFormDialogVisible = ref(false);
@@ -83,6 +89,8 @@ const onClickStocksRecievingFormCancel = () => {
 
 onMounted(() => {
   fetchData();
+  fetchSupplieres();
+  fetchIngredientMsts();
 });
 
 const fetchData = async () => {
@@ -91,6 +99,26 @@ const fetchData = async () => {
   tableData.splice(0);
   sortedData.forEach((item) => {
     tableData.push(item);
+  });
+};
+
+const fetchSupplieres = async () => {
+  const data = await supplierRepo.fetchAll();
+  const sortedData = supplierServices.sortByName(data.result);
+  suppliers.splice(0);
+  sortedData.forEach((item) => {
+    suppliers.push(item);
+  });
+};
+
+const fetchIngredientMsts = async () => {
+  const data = await ingredientRepo.fetchAll();
+  const sortedData = ingredientService.sortByClassifientNameAndName(
+    data.result
+  );
+  ingredientMsts.splice(0);
+  sortedData.forEach((item) => {
+    ingredientMsts.push(item);
   });
 };
 
@@ -130,9 +158,11 @@ const formatDate = (row, column, cellValue) =>
         </el-table>
       </el-col>
     </el-row>
-    <el-dialog v-model="masterIngredientClassificationFormDialogVisible">
+    <el-dialog v-model="StocksRecievingFormDialogVisible">
       <StocksRecievingForm
-        :ingredientClassificationData="a_ingredientClassificationData"
+        :recieveEventData="recieveEventData"
+        :suppliers="suppliers"
+        :ingredientMsts="ingredientMsts"
         @clickSubmit="onSubmitRecieveEvent($event)"
         @clickCancel="onClickStocksRecievingFormCancel"
         @clickDelete="onClickStocksRecievingFormDelete($event)"

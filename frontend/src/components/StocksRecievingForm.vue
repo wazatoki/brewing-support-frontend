@@ -16,20 +16,20 @@ import {
 } from "element-plus/dist/index.full.js";
 
 const props = defineProps({
-  recieveEvent: RecieveEvent,
+  recieveEventData: RecieveEvent,
   suppliers: [],
-  itemMsts: [],
+  ingredientMsts: [],
 });
 
 const emit = defineEmits(["clickSubmit", "clickCancel", "clickDelete"]);
 
-const form = reactive(props.recieveEvent);
-const selectedSupplierID = ref(props.recieveEvent.supplier.id);
+const form = reactive(props.recieveEventData);
+const selectedSupplierID = ref(props.recieveEventData.supplier.id);
 
 const formLabelWidth = "140px";
 
 const addIngredient = () => {
-  form.ingredients.push(new RecievedIngredient("", props.itemMsts[0], 0));
+  form.ingredients.push(new RecievedIngredient("", props.ingredientMsts[0], 0));
 };
 
 const updateStockRecievingItemData = (stockRecievingItemData, index) => {
@@ -155,7 +155,7 @@ const onSupplierChange = () => {
       v-for="(ingredient, index) in form.ingredients"
       :key="ingredient.id"
       :stockRecievingItemData="form.ingredients[index]"
-      :item-msts="itemMsts"
+      :item-msts="ingredientMsts"
       @update:stockRecievingItemData="
         updateStockRecievingItemData($event, index)
       "
