@@ -60,7 +60,18 @@ const onCancel = () => {
 };
 
 const onDelete = () => {
-  emit("clickDelete", form.id);
+  emit(
+    "clickDelete",
+    new RecieveEvent(
+      form.id,
+      form.noteNO,
+      form.noteDate,
+      form.supplier,
+      form.recieveDate,
+      form.ingredients,
+      form.footNote
+    )
+  );
 };
 
 const onSupplierChange = () => {

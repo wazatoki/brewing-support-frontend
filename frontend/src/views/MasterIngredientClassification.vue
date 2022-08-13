@@ -83,7 +83,7 @@ const fetchData = async () => {
 </script>
 
 <template>
-  <div class="unit-master">
+  <div class="ingredient-classification-master">
     <el-row>
       <el-col :span="6">
         <el-menu>

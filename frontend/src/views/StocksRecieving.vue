@@ -1,14 +1,15 @@
 <script setup>
 import { fetchAll, save, remove } from "@/repositories/recieveEventRepo";
 import { reactive, ref, onMounted } from "vue";
-import MasterIngredientClassificationForm from "@/components/MasterIngredientClassificationForm.vue";
-import { IngredientClassification } from "@/models/ingredientClassification";
-import { sortByName } from "@/services/ingredientClassification";
+import StocksRecievingForm from "@/components/StocksRecievingForm.vue";
+import { RecieveEvent } from "@/models/recieveEvent";
+import { sortBySupplierNameAndRecieveDate } from "@/services/recieveEvent";
 import { ElMessageBox } from "element-plus";
+import dayjs from "dayjs";
 
 const tableData = reactive([]);
-const a_ingredientClassificationData = reactive(new IngredientClassification());
-const masterIngredientClassificationFormDialogVisible = ref(false);
+const recieveEventData = reactive(new RecieveEvent());
+const StocksRecievingFormDialogVisible = ref(false);
 
 const onClickDelete = async (index) => {
   await ElMessageBox.confirm("データを削除しますか?", {
@@ -32,23 +33,25 @@ const onClickDelete = async (index) => {
 
 const onClickEdit = (index) => {
   const item = tableData[index];
-  a_ingredientClassificationData.id = item.id;
-  a_ingredientClassificationData.name = item.name;
-  masterIngredientClassificationFormDialogVisible.value = true;
+  recieveEventData.id = item.id;
+  recieveEventData.noteNO = item.noteNO;
+  recieveEventData.noteDate = item.noteDate;
+  recieveEventData.supplier = item.supplier;
+  recieveEventData.recieveDate = item.recieveDate;
+  recieveEventData.ingredients = item.ingredients;
+  recieveEventData.footNote = item.footNote;
+  StocksRecievingFormDialogVisible.value = true;
 };
 
 const onClickCreate = () => {
-  a_ingredientClassificationData.clear();
-  a_ingredientClassificationData.id = "";
-  masterIngredientClassificationFormDialogVisible.value = true;
+  recieveEventData.clear();
+  StocksRecievingFormDialogVisible.value = true;
 };
 
-const onSubmitIngredientClassification = async (
-  ingredientClassificationData
-) => {
-  masterIngredientClassificationFormDialogVisible.value = false;
+const onSubmitRecieveEvent = async (recieveEventData) => {
+  StocksRecievingFormDialogVisible.value = false;
   try {
-    await save(ingredientClassificationData);
+    await save(recieveEventData);
     ElMessageBox.alert("データの保存に成功しました。", {
       confirmButtonText: "OK",
     });
@@ -60,8 +63,22 @@ const onSubmitIngredientClassification = async (
   }
 };
 
-const onClickMasterIngredientClassificationFormCancel = () => {
-  masterIngredientClassificationFormDialogVisible.value = false;
+const onClickStocksRecievingFormDelete = async (recieveEventData) => {
+  try {
+    await remove(recieveEventData);
+    ElMessageBox.alert("データの削除に成功しました。", {
+      confirmButtonText: "OK",
+    });
+    fetchData();
+  } catch (error) {
+    ElMessageBox.alert("データの削除に失敗しました。" + error.message, {
+      confirmButtonText: "OK",
+    });
+  }
+};
+
+const onClickStocksRecievingFormCancel = () => {
+  StocksRecievingFormDialogVisible.value = false;
 };
 
 onMounted(() => {
@@ -70,16 +87,19 @@ onMounted(() => {
 
 const fetchData = async () => {
   const data = await fetchAll();
-  const sortedData = sortByName(data.result);
+  const sortedData = sortBySupplierNameAndRecieveDate(data.result);
   tableData.splice(0);
   sortedData.forEach((item) => {
     tableData.push(item);
   });
 };
+
+const formatDate = (row, column, cellValue) =>
+  dayjs(cellValue).format("YYYY/MM/DD");
 </script>
 
 <template>
-  <div class="unit-master">
+  <div class="stocks-recieving">
     <el-row>
       <el-col :span="6">
         <el-menu>
@@ -88,7 +108,13 @@ const fetchData = async () => {
       </el-col>
       <el-col :span="18">
         <el-table :data="tableData" stripe style="width: 100%">
-          <el-table-column prop="name" label="名称" />
+          <el-table-column
+            prop="recieveDate"
+            label="入荷日付"
+            :formatter="formatDate"
+          />
+          <el-table-column prop="supplier.name" label="仕入先" />
+
           <el-table-column>
             <template #default="scope">
               <el-button @click="onClickEdit(scope.$index, scope.row)"
@@ -105,12 +131,13 @@ const fetchData = async () => {
       </el-col>
     </el-row>
     <el-dialog v-model="masterIngredientClassificationFormDialogVisible">
-      <MasterIngredientClassificationForm
+      <StocksRecievingForm
         :ingredientClassificationData="a_ingredientClassificationData"
-        @submit="onSubmitIngredientClassification($event)"
-        @cancel="onClickMasterIngredientClassificationFormCancel"
+        @clickSubmit="onSubmitRecieveEvent($event)"
+        @clickCancel="onClickStocksRecievingFormCancel"
+        @clickDelete="onClickStocksRecievingFormDelete($event)"
       >
-      </MasterIngredientClassificationForm>
+      </StocksRecievingForm>
     </el-dialog>
   </div>
 </template>
