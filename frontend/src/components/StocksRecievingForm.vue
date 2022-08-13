@@ -3,7 +3,6 @@ import { reactive, ref } from "vue";
 import StocksRecievingItem from "@/components/StocksRecievingItem.vue";
 import { RecieveEvent } from "@/models/recieveEvent";
 import { RecievedIngredient } from "@/models/recievedIngredient";
-import { Supplier } from "@/models/supplier";
 import {
   ElRow,
   ElCol,
