@@ -43,6 +43,7 @@ const onClickEdit = (index) => {
 
 const onClickCreate = () => {
   a_ingredientClassificationData.clear();
+  a_ingredientClassificationData.id = "";
   masterIngredientClassificationFormDialogVisible.value = true;
 };
 

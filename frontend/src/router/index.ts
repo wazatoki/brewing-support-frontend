@@ -55,7 +55,7 @@ const routes: Array<RouteRecordRaw> = [
     component: ReportIngredient,
   },
   {
-    path: "stocks-recieving",
+    path: "/stocks-recieving",
     name: "recievedIngredient",
     component: StocksRecieving,
   },
