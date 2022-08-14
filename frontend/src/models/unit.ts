@@ -27,7 +27,12 @@ export class Unit implements UnitMember {
     };
   }
 
-  constructor(id = "", name = "", conversionFactor = 1, baseUnit = null) {
+  constructor(
+    id = "",
+    name = "",
+    conversionFactor = 1,
+    baseUnit: Unit | null = null
+  ) {
     this.id = id;
     this.name = name;
     this.conversionFactor = conversionFactor;

@@ -1,9 +1,14 @@
 <script setup>
-import { onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
+import * as recieveEventRepo from "@/repositories/recieveEventRepo";
+import * as brewPlanRepo from "@/repositories/brewPlanRepo";
 import * as brewEventRepo from "@/repositories/brewEventRepo";
 import * as ingredientRepo from "@/repositories/ingredientRepo";
 import * as ingredientClassificationRepo from "@/repositories/ingredientClassificationRepo";
+import * as reportIngredientService from "@/services/reportIngredient";
 import dayjs from "dayjs";
+import { ReportIngredient } from "@/models/reportIngredient";
+import * as processingType from "@/models/processingType";
 
 const ingredientClassifications = reactive([]);
 const ingredients = reactive([]);
@@ -12,12 +17,24 @@ const selectedIngredientClassificationID = ref();
 const selectedIngredientID = ref();
 const ingredientsBuffer = [];
 const brewEventsBuffer = [];
+const brewPlansBuffer = [];
+const recieveEventsBuffer = [];
+const reportDataBuffer = [];
+const consumedIngredientSum = ref(0);
+const recievedIngredientSum = ref(0);
 
 onMounted(async () => {
+  brewPlansBuffer.splice(0);
+  recieveEventsBuffer.splice(0);
   brewEventsBuffer.splice(0);
   ingredientsBuffer.splice(0);
   ingredientClassifications.splice(0);
-
+  (await brewPlanRepo.fetchAll()).result.forEach((item) => {
+    brewPlansBuffer.push(item);
+  });
+  (await recieveEventRepo.fetchAll()).result.forEach((item) => {
+    recieveEventsBuffer.push(item);
+  });
   (await brewEventRepo.fetchAll()).result.forEach((item) => {
     brewEventsBuffer.push(item);
   });
@@ -43,18 +60,57 @@ const onChangeIngredientClassification = () => {
 };
 
 const onChangeIngredient = () => {
-  tableData.splice(0);
+  reportDataBuffer.splice(0);
   brewEventsBuffer.forEach((brewEvent) => {
     brewEvent.ingredients.forEach((consumedIngredient) => {
       if (consumedIngredient.ingredient.id === selectedIngredientID.value) {
-        tableData.push({
-          fromDate: brewEvent.from,
-          ingredient: consumedIngredient.ingredient,
-          quantity: consumedIngredient.quantity,
-        });
+        reportDataBuffer.push(
+          new ReportIngredient(
+            "",
+            brewEvent.from,
+            processingType.brewing,
+            consumedIngredient.ingredient,
+            null,
+            brewPlansBuffer.find((item) => item.id === brewEvent.brewPlanID),
+            consumedIngredient.quantity,
+            consumedIngredient.ingredient.brewingUnit.name
+          )
+        );
       }
     });
   });
+  recieveEventsBuffer.forEach((recieveEvent) => {
+    recieveEvent.ingredients.forEach((recievedIngredient) => {
+      if (recievedIngredient.ingredient.id === selectedIngredientID.value) {
+        reportDataBuffer.push(
+          new ReportIngredient(
+            "",
+            recieveEvent.recieveDate,
+            processingType.recieving,
+            recievedIngredient.ingredient,
+            recieveEvent.supplier,
+            null,
+            recievedIngredient.quantity,
+            recievedIngredient.ingredient.recievingUnit.name
+          )
+        );
+      }
+    });
+  });
+
+  tableData.splice(0);
+  reportDataBuffer.forEach((item) => {
+    tableData.push(item);
+  });
+
+  consumedIngredientSum.value = reportIngredientService.comsumedQuantity(
+    selectedIngredientID.value,
+    reportDataBuffer
+  );
+  recievedIngredientSum.value = reportIngredientService.recievedQuantity(
+    selectedIngredientID.value,
+    reportDataBuffer
+  );
 };
 
 const formatDate = (row, column, cellValue) =>
@@ -94,15 +150,36 @@ const formatDate = (row, column, cellValue) =>
       </el-col>
       <el-col :span="18">
         <el-row>
+          <el-col :span="12"> 入荷合計: {{ consumedIngredientSum }} </el-col>
+          <el-col :span="12"> 使用合計: {{ recievedIngredientSum }} </el-col>
+        </el-row>
+        <el-row>
           <el-table :data="tableData" style="width: 100%">
             <el-table-column
-              prop="fromDate"
+              prop="processingDate"
               :formatter="formatDate"
               label="日付"
               width="180"
             />
+            <el-table-column
+              prop="processingType"
+              label="処理区分"
+              width="180"
+            />
             <el-table-column prop="ingredient.name" label="名称" width="180" />
-            <el-table-column prop="quantity" label="使用数" />
+            <el-table-column prop="supplier.name" label="仕入先" width="180" />
+            <el-table-column
+              prop="brewPlan.batchNumber"
+              label="batch NO"
+              width="180"
+            />
+            <el-table-column
+              prop="brewPlan.name"
+              label="batch name"
+              width="180"
+            />
+            <el-table-column prop="quantity" label="数量" />
+            <el-table-column prop="unitName" label="単位" />
           </el-table>
         </el-row>
       </el-col>
