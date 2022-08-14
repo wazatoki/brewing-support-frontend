@@ -9,12 +9,17 @@ import * as reportIngredientService from "@/services/reportIngredient";
 import dayjs from "dayjs";
 import { ReportIngredient } from "@/models/reportIngredient";
 import * as processingType from "@/models/processingType";
+import { Ingredient } from "@/models/ingredient";
+import { Unit } from "@/models/unit";
 
 const ingredientClassifications = reactive([]);
 const ingredients = reactive([]);
 const tableData = reactive([]);
 const selectedIngredientClassificationID = ref();
 const selectedIngredientID = ref();
+const selectedIngredient = ref(
+  new Ingredient("", "", 1, new Unit(), new Unit(), new Unit())
+);
 const ingredientsBuffer = [];
 const brewEventsBuffer = [];
 const brewPlansBuffer = [];
@@ -72,8 +77,8 @@ const onChangeIngredient = () => {
             consumedIngredient.ingredient,
             null,
             brewPlansBuffer.find((item) => item.id === brewEvent.brewPlanID),
-            consumedIngredient.quantity,
-            consumedIngredient.ingredient.brewingUnit.name
+            consumedIngredient.convertToStockingUnit.quantity,
+            consumedIngredient.convertToStockingUnit.stockingUnit.name
           )
         );
       }
@@ -90,8 +95,8 @@ const onChangeIngredient = () => {
             recievedIngredient.ingredient,
             recieveEvent.supplier,
             null,
-            recievedIngredient.quantity,
-            recievedIngredient.ingredient.recievingUnit.name
+            recievedIngredient.convertToStockingUnit.quantity,
+            recievedIngredient.convertToStockingUnit.stockingUnit.name
           )
         );
       }
@@ -110,6 +115,9 @@ const onChangeIngredient = () => {
   recievedIngredientSum.value = reportIngredientService.recievedQuantity(
     selectedIngredientID.value,
     reportDataBuffer
+  );
+  selectedIngredient.value = ingredientsBuffer.find(
+    (item) => item.id === selectedIngredientID.value
   );
 };
 
@@ -150,8 +158,17 @@ const formatDate = (row, column, cellValue) =>
       </el-col>
       <el-col :span="18">
         <el-row>
-          <el-col :span="12"> 入荷合計: {{ consumedIngredientSum }} </el-col>
-          <el-col :span="12"> 使用合計: {{ recievedIngredientSum }} </el-col>
+          <el-col :span="8">
+            {{ selectedIngredient.name }}
+          </el-col>
+          <el-col :span="8">
+            入荷合計: {{ consumedIngredientSum }}
+            {{ selectedIngredient.stockingUnit.name }}</el-col
+          >
+          <el-col :span="8">
+            使用合計: {{ recievedIngredientSum }}
+            {{ selectedIngredient.stockingUnit.name }}</el-col
+          >
         </el-row>
         <el-row>
           <el-table :data="tableData" style="width: 100%">
@@ -179,7 +196,7 @@ const formatDate = (row, column, cellValue) =>
               width="180"
             />
             <el-table-column prop="quantity" label="数量" />
-            <el-table-column prop="unitName" label="単位" />
+            <el-table-column prop="unitName" label="在庫単位" />
           </el-table>
         </el-row>
       </el-col>

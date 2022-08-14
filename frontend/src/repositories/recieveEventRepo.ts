@@ -3,6 +3,10 @@ import { RecieveEvent, RecieveEventMember } from "@/models/recieveEvent";
 import { createUUID } from "@/services/utils";
 import getDBInstance from "./pouchdb";
 import { instanceToPlain } from "class-transformer";
+import { RecievedIngredient } from "@/models/recievedIngredient";
+import { Ingredient } from "@/models/ingredient";
+import { IngredientClassification } from "@/models/ingredientClassification";
+import { Unit } from "@/models/unit";
 
 const typename = "recieve-event";
 const prefix = typename + "-";
@@ -34,13 +38,50 @@ export async function fetchAll(): Promise<{
         };
       }) => {
         if (item.doc) {
+          const ingredients: RecievedIngredient[] = [];
+          if (item.doc.ingredients) {
+            item.doc.ingredients.forEach((item) => {
+              ingredients.push(
+                new RecievedIngredient(
+                  item.id,
+                  new Ingredient(
+                    item.ingredient.id,
+                    item.ingredient.name,
+                    new IngredientClassification(
+                      item.ingredient.ingredientClassification.id,
+                      item.ingredient.ingredientClassification.name
+                    ),
+                    new Unit(
+                      item.ingredient.brewingUnit.id,
+                      item.ingredient.brewingUnit.name,
+                      item.ingredient.brewingUnit.conversionFactor,
+                      item.ingredient.brewingUnit.baseUnit
+                    ),
+                    new Unit(
+                      item.ingredient.recievingUnit.id,
+                      item.ingredient.recievingUnit.name,
+                      item.ingredient.brewingUnit.conversionFactor,
+                      item.ingredient.recievingUnit.baseUnit
+                    ),
+                    new Unit(
+                      item.ingredient.stockingUnit.id,
+                      item.ingredient.stockingUnit.name,
+                      item.ingredient.stockingUnit.conversionFactor,
+                      item.ingredient.stockingUnit.baseUnit
+                    )
+                  ),
+                  item.quantity
+                )
+              );
+            });
+          }
           const recieveEvent = new RecieveEvent(
             item.doc.id,
             item.doc.noteNO,
             item.doc.noteDate,
             item.doc.supplier,
             item.doc.recieveDate,
-            item.doc.ingredients,
+            ingredients,
             item.doc.footNote
           );
           result.push(recieveEvent);
