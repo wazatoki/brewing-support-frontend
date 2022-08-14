@@ -1,6 +1,5 @@
 import { ReportIngredient } from "@/models/reportIngredient";
 import * as processingType from "@/models/processingType";
-import { ITEM_RENDER_EVT } from "element-plus/es/components/virtual-list/src/defaults";
 
 export const comsumedQuantity = (
   ingredientID: string,
