@@ -18,7 +18,7 @@ const props = defineProps({
 const emit = defineEmits(["update:stockRecievingItemData", "deleteItem"]);
 
 const quantity = ref(props.stockRecievingItemData.quantity);
-const unitName = ref(props.stockRecievingItemData.ingredient.brewingUnit.name);
+const unitName = ref(props.stockRecievingItemData.ingredient.recievingUnit.name);
 const selectedItemID = ref(props.stockRecievingItemData.ingredient.id);
 
 const onChange = () => {
@@ -55,6 +55,7 @@ const clickDelete = () => {
     <el-col :span="14">
       <el-select
         @change="onChange"
+        @blur="emitData"
         v-model="selectedItemID"
         class="form-input"
         placeholder="品名"

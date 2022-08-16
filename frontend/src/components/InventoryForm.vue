@@ -1,44 +1,29 @@
 <script setup>
 import { reactive, ref } from "vue";
 import { Inventory } from "@/models/inventory";
+import InventoryItem from "@/components/InventoryItem.vue";
+import { InventoryIngredient } from "@/models/inventoryIngredient";
 
 const props = defineProps({
   inventory: Inventory,
+  itemMsts: [],
 });
 
 const emit = defineEmits(["submit", "cancel"]);
 
 const form = reactive(props.inventory);
 
-const rules = reactive({
-  onDate: [
-    { required: true, message: "実施日付は必須項目です。", trigger: "blur" },
-  ],
-  resultValue: [
-    {
-      required: true,
-      message: "確認数量は必須です。",
-      trigger: "blur",
-    },
-    {
-      type: "number",
-      message: "確認数量は数値を入力してください。",
-      trigger: "blur",
-    },
-  ],
-  adjustedValue: [
-    {
-      required: true,
-      message: "修正数量は必須です。",
-      trigger: "blur",
-    },
-    {
-      type: "number",
-      message: "修正数量は数値を入力してください。",
-      trigger: "blur",
-    },
-  ],
-});
+const addIngredient = () => {
+  form.ingredients.push(new InventoryIngredient("", props.itemMsts[0], 0, 0, 0, ""));
+};
+
+const updateInventoryItemData = (inventoryItemData, index) => {
+  form.ingredients[index] = inventoryItemData;
+};
+
+const removeInventoryItemData = (index) => {
+  form.ingredients.splice(index, 1);
+};
 
 const formRef = ref();
 
@@ -89,35 +74,18 @@ const onCancel = () => {
       </el-col>
     </el-row>
     <el-row>
-      <el-col :span="8">
-        <label>計算数量:</label><span>{{ form.calculatedValue }}</span>
-      </el-col>
-      <el-col :span="8">
-        <el-form-item
-          label="確認数量"
-          :label-width="formLabelWidth"
-          prop="resultValue"
-        >
-          <el-input v-model="form.resultValue" autocomplete="off" />
-        </el-form-item>
-      </el-col>
-      <el-col :span="8">
-        <el-form-item
-          label="修正数量"
-          :label-width="formLabelWidth"
-          prop="adjustedValue"
-        >
-          <el-input v-model="form.adjustedValue" autocomplete="off" />
-        </el-form-item>
+      <el-col :span="4">
+        <el-button type="primary" @click="addIngredient">Add</el-button>
       </el-col>
     </el-row>
-    <el-row>
-      <el-col :span="24">
-        <el-form-item label="備考" :label-width="formLabelWidth">
-          <el-input type="textarea" v-model="form.note" autocomplete="off" />
-        </el-form-item>
-      </el-col>
-    </el-row>
+    <InventoryItem
+      v-for="(ingredient, index) in form.ingredients"
+      :key="ingredient.id"
+      :inventoryItemData="form.ingredients[index]"
+      :item-msts="itemMsts"
+      @update:inventoryItemData="updateInventoryItemData($event, index)"
+      @deleteItem="removeInventoryItemData(index)"
+    ></InventoryItem>
     <el-row>
       <el-col>
         <el-button type="primary" @click="onSubmit(formRef)">確定</el-button>

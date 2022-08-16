@@ -1,24 +1,27 @@
+import { InventoryIngredient } from "@/models/inventoryIngredient";
+
 export class Inventory {
   id: string;
   onDate: Date;
-  resultValue: number;
-  calculatedValue: number;
-  adjustedValue: number;
+  ingredients: InventoryIngredient[];
   note: string;
+
+  clear() {
+    this.id = "";
+    this.onDate = new Date();
+    this.ingredients = [] as InventoryIngredient[];
+    this.note = "";
+  }
 
   constructor(
     id = "",
     onDate = new Date(),
-    resultValue = 0,
-    calculatedValue: number,
-    adjustedValue = 0,
+    ingredients = [] as InventoryIngredient[],
     note = ""
   ) {
     this.id = id;
     this.onDate = onDate;
-    this.resultValue = resultValue;
-    this.calculatedValue = calculatedValue;
-    this.adjustedValue = adjustedValue;
+    this.ingredients = ingredients;
     this.note = note;
   }
 }
@@ -26,8 +29,6 @@ export class Inventory {
 export interface InventoryMember {
   id: string;
   onDate: Date;
-  resultValue: number;
-  calculatedValue: number;
-  adjustedValue: number;
+  ingredients: InventoryIngredient[];
   note: string;
 }
