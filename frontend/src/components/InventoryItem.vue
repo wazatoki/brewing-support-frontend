@@ -74,6 +74,7 @@ const clickDelete = () => {
         v-model="selectedItemID"
         class="form-input"
         placeholder="品名"
+        :teleported="false"
       >
         <el-option
           v-for="item in itemMsts"
