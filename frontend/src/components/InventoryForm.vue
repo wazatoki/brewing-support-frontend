@@ -101,6 +101,9 @@ const onCancel = () => {
       :key="ingredient.id"
       :inventoryItemData="form.ingredients[index]"
       :item-msts="itemMsts"
+      :inventories="inventories"
+      :brewEvents="brewEvents"
+      :recieveEvents="recieveEvents"
       @update:inventoryItemData="updateInventoryItemData($event, index)"
       @deleteItem="removeInventoryItemData(index)"
     ></InventoryItem>

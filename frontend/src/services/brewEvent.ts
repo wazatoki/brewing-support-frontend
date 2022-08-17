@@ -13,13 +13,9 @@ export const consumedIngredientSum = (
     filteredConsumedIngredients.forEach((item) => buffer.push(item));
   });
 
-  const result = buffer.reduce(
-    (acc, elem) => Number(acc) + Number(elem.quantity),
-    0
-  );
-  if (buffer.length === 0) {
-    return 0;
-  }
+  const result = buffer
+    .map((item) => Number(item.convertToBaseUnit.quantity))
+    .reduce((acc, elem) => acc + elem, 0);
 
-  return buffer[0].convertToBaseUnit.quantity;
+  return result;
 };

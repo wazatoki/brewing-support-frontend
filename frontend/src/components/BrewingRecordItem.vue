@@ -55,7 +55,6 @@ const clickDelete = () => {
     <el-col :span="14">
       <el-select
         @change="onChange"
-        @blur="emitData"
         v-model="selectedItemID"
         class="form-input"
         placeholder="品名"

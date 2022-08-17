@@ -9,10 +9,14 @@ import {
   ElInput,
   ElButton,
 } from "element-plus/dist/index.full.js";
+import { inventoryCalculatedValue } from "@/services/inventory";
 
 const props = defineProps({
   inventoryItemData: InventoryIngredient,
   itemMsts: [],
+  inventories: [],
+  brewEvents: [],
+  recieveEvents: [],
 });
 
 const emit = defineEmits(["update:inventoryItemData", "deleteItem"]);
@@ -32,6 +36,12 @@ const onChange = () => {
 
   if (ingredient) {
     unitName.value = ingredient.stockingUnit.name;
+    calculatedValue.value = inventoryCalculatedValue(
+      ingredient.id,
+      props.inventories,
+      props.brewEvents,
+      props.recieveEvents
+    );
   }
 
   emitData();

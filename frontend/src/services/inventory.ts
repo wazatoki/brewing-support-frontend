@@ -28,15 +28,11 @@ export const inventoryIngredientSum = (
     filteredInventoryIngredients.forEach((item) => buffer.push(item));
   });
 
-  const result = buffer.reduce(
-    (acc, elem) => Number(acc) + Number(elem.adjustedValue),
-    0
-  );
-  if (buffer.length === 0) {
-    return 0;
-  }
+  const result = buffer
+    .map((item) => Number(item.convertAdjustedValueToBaseUnit.quantity))
+    .reduce((acc, elem) => acc + elem, 0);
 
-  return buffer[0].convertAdjustedValueToBaseUnit.quantity;
+  return result;
 };
 
 export const inventoryCalculatedValue = (
@@ -45,6 +41,9 @@ export const inventoryCalculatedValue = (
   brewEvents: BrewEvent[],
   recieveEvents: RecieveEvent[]
 ) => {
+  console.log(inventoryIngredientSum(ingredientID, inventories));
+  console.log(recievedIngredientSum(ingredientID, recieveEvents));
+  console.log(consumedIngredientSum(ingredientID, brewEvents));
   return (
     inventoryIngredientSum(ingredientID, inventories) +
     recievedIngredientSum(ingredientID, recieveEvents) -
