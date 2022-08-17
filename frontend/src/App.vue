@@ -14,22 +14,25 @@
         ><router-link to="/stocks-recieving">入荷</router-link></el-menu-item
       >
       <el-menu-item index="4"
+        ><router-link to="/inventory">棚卸</router-link></el-menu-item
+      >
+      <el-menu-item index="5"
         ><router-link to="/report-ingredient">Report</router-link></el-menu-item
       >
-      <el-sub-menu index="5">
+      <el-sub-menu index="6">
         <template #title>各種マスタ</template>
-        <el-menu-item index="5-1"
+        <el-menu-item index="6-1"
           ><router-link to="/master-ingredient">原料</router-link></el-menu-item
         >
-        <el-menu-item index="5-2"
+        <el-menu-item index="6-2"
           ><router-link to="/master-ingredient-classification"
             >原料種類</router-link
           ></el-menu-item
         >
-        <el-menu-item index="5-3"
+        <el-menu-item index="6-3"
           ><router-link to="/master-unit">単位</router-link></el-menu-item
         >
-        <el-menu-item index="5-4"
+        <el-menu-item index="6-4"
           ><router-link to="/master-supplier">取引先</router-link></el-menu-item
         >
       </el-sub-menu>

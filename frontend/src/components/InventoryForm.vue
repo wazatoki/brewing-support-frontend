@@ -3,10 +3,14 @@ import { reactive, ref } from "vue";
 import { Inventory } from "@/models/inventory";
 import InventoryItem from "@/components/InventoryItem.vue";
 import { InventoryIngredient } from "@/models/inventoryIngredient";
+import { inventoryCalculatedValue } from "@/services/inventory";
 
 const props = defineProps({
   inventory: Inventory,
   itemMsts: [],
+  inventories: [],
+  brewEvents: [],
+  recieveEvents: [],
 });
 
 const emit = defineEmits(["submit", "cancel"]);
@@ -14,7 +18,21 @@ const emit = defineEmits(["submit", "cancel"]);
 const form = reactive(props.inventory);
 
 const addIngredient = () => {
-  form.ingredients.push(new InventoryIngredient("", props.itemMsts[0], 0, 0, 0, ""));
+  form.ingredients.push(
+    new InventoryIngredient(
+      "",
+      props.itemMsts[0],
+      0,
+      inventoryCalculatedValue(
+        props.itemMsts[0].id,
+        props.inventories,
+        props.brewEvents,
+        props.recieveEvents
+      ),
+      0,
+      ""
+    )
+  );
 };
 
 const updateInventoryItemData = (inventoryItemData, index) => {

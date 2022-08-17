@@ -7,6 +7,7 @@ import MasterIngredientClassification from "@/views/MasterIngredientClassificati
 import MasterSupplier from "@/views/MasterSupplier.vue";
 import ReportIngredient from "@/views/ReportIngredient.vue";
 import StocksRecieving from "@/views/StocksRecieving.vue";
+import InventoryIndex from "@/views/InventoryIndex.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -58,6 +59,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/stocks-recieving",
     name: "recievedIngredient",
     component: StocksRecieving,
+  },
+  {
+    path: "/inventory",
+    name: "inventory-index",
+    component: InventoryIndex,
   },
 ];
 

@@ -1,4 +1,5 @@
 import { Ingredient } from "@/models/ingredient";
+import { Unit } from "@/models/unit";
 import { createUUID } from "@/services/utils";
 
 export class InventoryIngredient {
@@ -8,6 +9,10 @@ export class InventoryIngredient {
   calculatedValue: number;
   adjustedValue: number;
   note: string;
+
+  get convertAdjustedValueToBaseUnit(): { quantity: number; baseUnit: Unit } {
+    return this.ingredient.stockingUnit.convertToBaseUnit(this.adjustedValue);
+  }
 
   constructor(
     id = "",

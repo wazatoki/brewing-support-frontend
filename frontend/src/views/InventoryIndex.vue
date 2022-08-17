@@ -1,12 +1,21 @@
 <script setup>
-import { fetchAll, save, remove } from "@/repositories/inventoryRepo";
 import { reactive, ref, onMounted } from "vue";
+import { ElMessageBox } from "element-plus";
+import { fetchAll, save, remove } from "@/repositories/inventoryRepo";
+import * as ingredientRepo from "@/repositories/ingredientRepo";
+import * as brewEventRepo from "@/repositories/brewEventRepo";
+import * as recieveEventRepo from "@/repositories/recieveEventRepo";
+import * as inventoryService from "@/services/inventory";
+import * as ingredientService from "@/services/ingredient";
+import * as brewEventService from "@/services/brewEvent";
+import * as recieveEventService from "@/services/recieveEvent";
 import InventoryForm from "@/components/InventoryForm.vue";
 import { Inventory } from "@/models/inventory";
-import * as inventoryService from "@/services/inventory";
-import { ElMessageBox } from "element-plus";
 
 const tableData = reactive([]);
+const itemMsts = reactive([]);
+const brewEvents = reactive([]);
+const recieveEvents = reactive([]);
 const inventoryData = reactive(new Inventory("", new Date(), 0, 0, 0, ""));
 const InventoryFormDialogVisible = ref(false);
 
@@ -68,6 +77,9 @@ const onClickInventoryFormCancel = () => {
 
 onMounted(() => {
   fetchData();
+  fetchItemMsts();
+  fetchBrewEbents();
+  fetchRecieveEbents();
 });
 
 const fetchData = async () => {
@@ -78,10 +90,35 @@ const fetchData = async () => {
     tableData.push(item);
   });
 };
+
+const fetchItemMsts = async () => {
+  const data = await ingredientRepo.fetchAll();
+  const sortedData = ingredientService.sortByClassifientNameAndName(
+    data.result
+  );
+  itemMsts.splice(0);
+  sortedData.forEach((item) => {
+    itemMsts.push(item);
+  });
+};
+const fetchBrewEbents = async () => {
+  const data = await brewEventRepo.fetchAll();
+  brewEvents.splice(0);
+  data.result.forEach((item) => {
+    brewEvents.push(item);
+  });
+};
+const fetchRecieveEbents = async () => {
+  const data = await recieveEventRepo.fetchAll();
+  recieveEvents.splice(0);
+  data.result.forEach((item) => {
+    recieveEvents.push(item);
+  });
+};
 </script>
 
 <template>
-  <div class="supplier-master">
+  <div class="inventory">
     <el-row>
       <el-col :span="6">
         <el-menu>
@@ -106,13 +143,17 @@ const fetchData = async () => {
         </el-table>
       </el-col>
     </el-row>
-    <el-dialog v-model="masterSupplierFormDialogVisible">
-      <MasterSupplierForm
-        :supplierData="a_supplierData"
-        @submit="onSubmitSupplier($event)"
-        @cancel="onClickMasterSupplierFormCancel"
+    <el-dialog v-model="InventoryFormDialogVisible">
+      <InventoryForm
+        :inventory="inventoryData"
+        itemMsts="itemMsts"
+        inventories="tableData"
+        brewEvents="brewEvents"
+        recieveEvents="recieveEvents"
+        @submit="onSubmitInventoryForm($event)"
+        @cancel="onClickInventoryFormCancel"
       >
-      </MasterSupplierForm>
+      </InventoryForm>
     </el-dialog>
   </div>
 </template>
