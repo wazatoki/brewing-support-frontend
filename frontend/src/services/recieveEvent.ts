@@ -25,7 +25,7 @@ export function sortBySupplierNameAndRecieveDate(
 
 export const recievedIngredientSum = (
   ingredientID: string,
-  recieveEvents: RecieveEvent[]
+  recieveEvents = [] as RecieveEvent[]
 ) => {
   const buffer = [] as RecievedIngredient[];
   recieveEvents.forEach((item) => {

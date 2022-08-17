@@ -57,11 +57,10 @@ const clickDelete = () => {
 </script>
 
 <template>
-  <el-row class="stock-recieving-item">
+  <el-row class="inventory-item">
     <el-col :span="6">
       <el-select
         @change="onChange"
-        @blur="emitData"
         v-model="selectedItemID"
         class="form-input"
         placeholder="品名"

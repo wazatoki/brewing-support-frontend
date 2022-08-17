@@ -143,13 +143,13 @@ const fetchRecieveEbents = async () => {
         </el-table>
       </el-col>
     </el-row>
-    <el-dialog v-model="InventoryFormDialogVisible">
+    <el-dialog v-model="InventoryFormDialogVisible" :width="1300">
       <InventoryForm
         :inventory="inventoryData"
-        itemMsts="itemMsts"
-        inventories="tableData"
-        brewEvents="brewEvents"
-        recieveEvents="recieveEvents"
+        :itemMsts="itemMsts"
+        :inventories="tableData"
+        :brewEvents="brewEvents"
+        :recieveEvents="recieveEvents"
         @submit="onSubmitInventoryForm($event)"
         @cancel="onClickInventoryFormCancel"
       >

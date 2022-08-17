@@ -162,11 +162,11 @@ const formatDate = (row, column, cellValue) =>
             {{ selectedIngredient.name }}
           </el-col>
           <el-col :span="8">
-            入荷合計: {{ consumedIngredientSum }}
+            入荷合計: {{ recievedIngredientSum }}
             {{ selectedIngredient.stockingUnit.name }}</el-col
           >
           <el-col :span="8">
-            使用合計: {{ recievedIngredientSum }}
+            使用合計: {{ consumedIngredientSum }}
             {{ selectedIngredient.stockingUnit.name }}</el-col
           >
         </el-row>

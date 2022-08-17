@@ -17,7 +17,7 @@ export function sortByDate(inventories: Inventory[]): Inventory[] {
 
 export const inventoryIngredientSum = (
   ingredientID: string,
-  inventories: Inventory[]
+  inventories = [] as Inventory[]
 ) => {
   const buffer = [] as InventoryIngredient[];
   inventories.forEach((item) => {

@@ -3,7 +3,7 @@ import { ConsumedIngredient } from "@/models/consumedIngredient";
 
 export const consumedIngredientSum = (
   ingredientID: string,
-  brewEvents: BrewEvent[]
+  brewEvents = [] as BrewEvent[]
 ) => {
   const buffer = [] as ConsumedIngredient[];
   brewEvents.forEach((item) => {
