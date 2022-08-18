@@ -53,14 +53,7 @@ const onSubmit = async (formEl) => {
     if (valid) {
       emit(
         "submit",
-        new Inventory(
-          form.id,
-          form.onDate,
-          form.resultValue,
-          form.calculatedValue,
-          form.adjustedValue,
-          form.note
-        )
+        new Inventory(form.id, form.onDate, form.ingredients, form.note)
       );
       console.log("submit!");
     } else {

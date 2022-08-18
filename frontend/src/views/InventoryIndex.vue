@@ -42,12 +42,9 @@ const onClickDelete = async (index) => {
 
 const onClickEdit = (index) => {
   const item = tableData[index];
+  console.log(item);
   inventoryData.id = item.id;
-  inventoryData.ingredient = item.ingredient;
-  inventoryData.onDate = item.onDate;
-  inventoryData.resultValue = item.resultValue;
-  inventoryData.calculatedValue = item.calculatedValue;
-  inventoryData.adjustedValue = item.adjustedValue;
+  inventoryData.ingredients = item.ingredients;
   inventoryData.note = item.note;
   InventoryFormDialogVisible.value = true;
 };
