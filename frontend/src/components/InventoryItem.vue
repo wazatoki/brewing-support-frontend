@@ -64,6 +64,10 @@ const emitData = () => {
 const clickDelete = () => {
   emit("deleteItem");
 };
+
+const calculateAdjustedValue = () => {
+  adjustedValue.value = resultValue.value - calculatedValue.value;
+};
 </script>
 
 <template>
@@ -91,6 +95,7 @@ const clickDelete = () => {
     <el-col :span="1">{{ unitName }}</el-col>
     <el-col :span="2">
       <el-input
+        @keypress="calculateAdjustedValue"
         @blur="emitData"
         v-model="resultValue"
         class="form-input"
