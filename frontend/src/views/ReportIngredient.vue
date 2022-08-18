@@ -6,7 +6,7 @@ import * as brewEventRepo from "@/repositories/brewEventRepo";
 import * as ingredientRepo from "@/repositories/ingredientRepo";
 import * as ingredientClassificationRepo from "@/repositories/ingredientClassificationRepo";
 import * as reportIngredientService from "@/services/reportIngredient";
-import dayjs from "dayjs";
+import * as utils from "@/services/utils";
 import { ReportIngredient } from "@/models/reportIngredient";
 import * as processingType from "@/models/processingType";
 import { Ingredient } from "@/models/ingredient";
@@ -121,8 +121,7 @@ const onChangeIngredient = () => {
   );
 };
 
-const formatDate = (row, column, cellValue) =>
-  dayjs(cellValue).format("YYYY/MM/DD HH:mm");
+const formatDate = (row, column, cellValue) => utils.formatDateTime(cellValue);
 </script>
 
 <template>

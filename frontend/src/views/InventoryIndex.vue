@@ -9,6 +9,7 @@ import * as inventoryService from "@/services/inventory";
 import * as ingredientService from "@/services/ingredient";
 import * as brewEventService from "@/services/brewEvent";
 import * as recieveEventService from "@/services/recieveEvent";
+import * as utils from "@/services/utils";
 import InventoryForm from "@/components/InventoryForm.vue";
 import { Inventory } from "@/models/inventory";
 
@@ -115,6 +116,8 @@ const fetchRecieveEbents = async () => {
     recieveEvents.push(item);
   });
 };
+
+const formatDate = (row, column, cellValue) => utils.formatDateTime(cellValue);
 </script>
 
 <template>
@@ -127,7 +130,12 @@ const fetchRecieveEbents = async () => {
       </el-col>
       <el-col :span="18">
         <el-table :data="tableData" stripe style="width: 100%">
-          <el-table-column prop="name" label="名称" />
+          <el-table-column
+            prop="onDate"
+            label="実施日"
+            :formatter="formatDate"
+          />
+          <el-table-column prop="note" label="備考" />
           <el-table-column>
             <template #default="scope">
               <el-button @click="onClickEdit(scope.$index, scope.row)"

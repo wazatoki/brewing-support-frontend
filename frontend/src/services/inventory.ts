@@ -41,9 +41,6 @@ export const inventoryCalculatedValue = (
   brewEvents: BrewEvent[],
   recieveEvents: RecieveEvent[]
 ) => {
-  console.log(inventoryIngredientSum(ingredientID, inventories));
-  console.log(recievedIngredientSum(ingredientID, recieveEvents));
-  console.log(consumedIngredientSum(ingredientID, brewEvents));
   return (
     inventoryIngredientSum(ingredientID, inventories) +
     recievedIngredientSum(ingredientID, recieveEvents) -

@@ -8,8 +8,8 @@ import { RecieveEvent } from "@/models/recieveEvent";
 import { sortBySupplierNameAndRecieveDate } from "@/services/recieveEvent";
 import * as supplierServices from "@/services/supplier";
 import * as ingredientService from "@/services/ingredient";
+import * as utils from "@/services/utils";
 import { ElMessageBox } from "element-plus";
-import dayjs from "dayjs";
 
 const suppliers = reactive([]);
 const ingredientMsts = reactive([]);
@@ -122,8 +122,7 @@ const fetchIngredientMsts = async () => {
   });
 };
 
-const formatDate = (row, column, cellValue) =>
-  dayjs(cellValue).format("YYYY/MM/DD");
+const formatDate = (row, column, cellValue) => utils.formatDate(cellValue);
 </script>
 
 <template>
