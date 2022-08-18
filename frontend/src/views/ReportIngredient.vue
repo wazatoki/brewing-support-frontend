@@ -4,6 +4,7 @@ import * as recieveEventRepo from "@/repositories/recieveEventRepo";
 import * as brewPlanRepo from "@/repositories/brewPlanRepo";
 import * as brewEventRepo from "@/repositories/brewEventRepo";
 import * as ingredientRepo from "@/repositories/ingredientRepo";
+import * as inventoryRepo from "@/repositories/inventoryRepo";
 import * as ingredientClassificationRepo from "@/repositories/ingredientClassificationRepo";
 import * as reportIngredientService from "@/services/reportIngredient";
 import * as utils from "@/services/utils";
@@ -24,15 +25,19 @@ const ingredientsBuffer = [];
 const brewEventsBuffer = [];
 const brewPlansBuffer = [];
 const recieveEventsBuffer = [];
+const inventoryBuffer = [];
 const reportDataBuffer = [];
 const consumedIngredientSum = ref(0);
 const recievedIngredientSum = ref(0);
+const inventoryIngredientAjustSum = ref(0);
+const inventoryQuantity = ref(0);
 
 onMounted(async () => {
   brewPlansBuffer.splice(0);
   recieveEventsBuffer.splice(0);
   brewEventsBuffer.splice(0);
   ingredientsBuffer.splice(0);
+  inventoryBuffer.splice(0);
   ingredientClassifications.splice(0);
   (await brewPlanRepo.fetchAll()).result.forEach((item) => {
     brewPlansBuffer.push(item);
@@ -45,6 +50,9 @@ onMounted(async () => {
   });
   (await ingredientRepo.fetchAll()).result.forEach((item) => {
     ingredientsBuffer.push(item);
+  });
+  (await inventoryRepo.fetchAll()).result.forEach((item) => {
+    inventoryBuffer.push(item);
   });
   (await ingredientClassificationRepo.fetchAll()).result.forEach((item) => {
     ingredientClassifications.push(item);
@@ -102,9 +110,29 @@ const onChangeIngredient = () => {
       }
     });
   });
+  inventoryBuffer.forEach((inventory) => {
+    inventory.ingredients.forEach((inventoryIngredient) => {
+      if (inventoryIngredient.ingredient.id === selectedIngredientID.value) {
+        reportDataBuffer.push(
+          new ReportIngredient(
+            "",
+            inventory.onDate,
+            processingType.inventory,
+            inventoryIngredient.ingredient,
+            null,
+            null,
+            inventoryIngredient.adjustedValue,
+            inventoryIngredient.ingredient.stockingUnit.name
+          )
+        );
+      }
+    });
+  });
+
+  const sortedBuffer = reportIngredientService.sortByDate(reportDataBuffer);
 
   tableData.splice(0);
-  reportDataBuffer.forEach((item) => {
+  sortedBuffer.forEach((item) => {
     tableData.push(item);
   });
 
@@ -112,10 +140,23 @@ const onChangeIngredient = () => {
     selectedIngredientID.value,
     reportDataBuffer
   );
+
   recievedIngredientSum.value = reportIngredientService.recievedQuantity(
     selectedIngredientID.value,
     reportDataBuffer
   );
+
+  inventoryIngredientAjustSum.value =
+    reportIngredientService.inventoryAdjustedQuantity(
+      selectedIngredientID.value,
+      reportDataBuffer
+    );
+
+  inventoryQuantity.value =
+    recievedIngredientSum.value -
+    consumedIngredientSum.value +
+    inventoryIngredientAjustSum.value;
+
   selectedIngredient.value = ingredientsBuffer.find(
     (item) => item.id === selectedIngredientID.value
   );
@@ -157,15 +198,23 @@ const formatDate = (row, column, cellValue) => utils.formatDateTime(cellValue);
       </el-col>
       <el-col :span="18">
         <el-row>
-          <el-col :span="8">
+          <el-col :span="6">
             {{ selectedIngredient.name }}
           </el-col>
-          <el-col :span="8">
+          <el-col :span="4">
             入荷合計: {{ recievedIngredientSum }}
             {{ selectedIngredient.stockingUnit.name }}</el-col
           >
-          <el-col :span="8">
+          <el-col :span="4">
             使用合計: {{ consumedIngredientSum }}
+            {{ selectedIngredient.stockingUnit.name }}</el-col
+          >
+          <el-col :span="4">
+            棚卸時調整合計: {{ inventoryIngredientAjustSum }}
+            {{ selectedIngredient.stockingUnit.name }}</el-col
+          >
+          <el-col :span="4">
+            在庫数: {{ inventoryQuantity }}
             {{ selectedIngredient.stockingUnit.name }}</el-col
           >
         </el-row>
