@@ -1,7 +1,7 @@
 import { Supplier, SupplierMember } from "@/models/supplier";
 
 import { createUUID } from "@/services/utils";
-import getDBInstance from "./pouchdb";
+import { getDBInstance } from "./pouchdb";
 import { instanceToPlain } from "class-transformer";
 
 const typename = "supplier";

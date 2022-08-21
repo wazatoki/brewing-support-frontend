@@ -1,6 +1,6 @@
 import { BrewEvent, BrewEventMember } from "@/models/brewEvent";
 import { createUUID } from "@/services/utils";
-import getDBInstance from "./pouchdb";
+import { getDBInstance } from "./pouchdb";
 import { instanceToPlain } from "class-transformer";
 import { ConsumedIngredient } from "@/models/consumedIngredient";
 import { Ingredient } from "@/models/ingredient";

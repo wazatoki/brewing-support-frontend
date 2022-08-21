@@ -3,7 +3,7 @@ import { unitReferencingList } from "@/services/unit";
 import { unitReferencingList as ingredientUnitReferencingList } from "@/services/ingredient";
 import { fetchAll as ingredientFetchAll } from "@/repositories/ingredientRepo";
 import { createUUID } from "@/services/utils";
-import getDBInstance from "./pouchdb";
+import { getDBInstance } from "./pouchdb";
 import { instanceToPlain } from "class-transformer";
 import { Ingredient } from "@/models/ingredient";
 

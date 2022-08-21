@@ -1,6 +1,6 @@
 import { Ingredient, IngredientMember } from "@/models/ingredient";
 import { createUUID } from "@/services/utils";
-import getDBInstance from "./pouchdb";
+import { getDBInstance } from "./pouchdb";
 import { instanceToPlain } from "class-transformer";
 
 const typename = "ingredient";

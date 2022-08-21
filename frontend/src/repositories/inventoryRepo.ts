@@ -1,7 +1,7 @@
 import { Inventory, InventoryMember } from "@/models/inventory";
 import { InventoryIngredient } from "@/models/inventoryIngredient";
 import { createUUID } from "@/services/utils";
-import getDBInstance from "./pouchdb";
+import { getDBInstance } from "./pouchdb";
 import { instanceToPlain } from "class-transformer";
 import { Ingredient } from "@/models/ingredient";
 import { IngredientClassification } from "@/models/ingredientClassification";

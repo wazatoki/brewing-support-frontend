@@ -1,7 +1,7 @@
 import { RecieveEvent, RecieveEventMember } from "@/models/recieveEvent";
 
 import { createUUID } from "@/services/utils";
-import getDBInstance from "./pouchdb";
+import { getDBInstance } from "./pouchdb";
 import { instanceToPlain } from "class-transformer";
 import { RecievedIngredient } from "@/models/recievedIngredient";
 import { Ingredient } from "@/models/ingredient";

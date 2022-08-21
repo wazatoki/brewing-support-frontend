@@ -1,6 +1,6 @@
 import { BrewPlan, BrewPlanMember } from "@/models/brewPlan";
 import { createUUID } from "@/services/utils";
-import getDBInstance from "./pouchdb";
+import { getDBInstance } from "./pouchdb";
 import { instanceToPlain } from "class-transformer";
 
 const typename = "brew_plan";

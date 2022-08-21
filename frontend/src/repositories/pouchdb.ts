@@ -2,8 +2,10 @@ import PouchDB from "pouchdb";
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 let db: PouchDB.Database<{}>;
+// eslint-disable-next-line @typescript-eslint/ban-types
+let remoteDB: PouchDB.Database<{}>;
 
-export default function getDBInstance(
+export function getDBInstance(
   dbName = "brewing_support_db"
   // eslint-disable-next-line @typescript-eslint/ban-types
 ): PouchDB.Database<{}> {
@@ -14,6 +16,21 @@ export default function getDBInstance(
   return (db = new PouchDB(`${dbName}`, {
     skip_setup: true,
   }));
+}
+
+export function getRemoteDBInstance(
+  dbName = location.protocol +
+    "//" +
+    location.hostname +
+    ":5984/brewing_support_db"
+  // eslint-disable-next-line @typescript-eslint/ban-types
+): PouchDB.Database<{}> {
+  console.log(dbName);
+  if (remoteDB && remoteDB.info.name === dbName) {
+    return remoteDB;
+  }
+
+  return (remoteDB = new PouchDB(`${dbName}`));
 }
 
 // export class CouchDbProvider {

@@ -6,7 +6,7 @@ import { BrewEvent } from "@/models/brewEvent";
 jest.mock("@/repositories/pouchdb");
 jest.mock("pouchdb");
 
-const mockedGetDBInstance = jest.spyOn(pouchdb, "default");
+const mockedGetDBInstance = jest.spyOn(pouchdb, "getDBInstance");
 
 // This is actually creates a **mocked pouchDb instance**. When we told Jest to import the pouchDb module it replaced constructors with ones that creates mocks.
 const mockedPouchDbInstance = new PouchDB();
